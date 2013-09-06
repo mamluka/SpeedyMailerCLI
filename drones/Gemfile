@@ -1,0 +1,6 @@
+source 'https://rubygems.org'
+
+gem 'clockwork'
+gem 'sidekiq'
+gem 'sinatra'
+gem 'redis'
