@@ -1,4 +1,3 @@
-require_relative '../core/orm'
 require_relative '../core/jobs'
 require_relative 'drone-config'
 
