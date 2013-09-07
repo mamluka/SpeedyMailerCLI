@@ -4,7 +4,7 @@ require 'sidekiq'
 require 'set'
 
 require_relative '../core/jobs'
-require_relative '../drones/drone-config'
+require_relative 'drone-config'
 
 class LRUCreativeIdLocator
   def initialize(size)
