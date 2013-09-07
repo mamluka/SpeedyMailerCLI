@@ -32,3 +32,5 @@ cd SpeedyMailerCLI-Cookbooks && ruby setup.rb <%= @drone_domain %> <%= @master_d
 echo "Run chef solo"
 
 rvmsudo chef-solo -c solo.rb -j node.json
+
+tmuxifier s drone
