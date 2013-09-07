@@ -1,3 +1,3 @@
 #!/bin/bash
-
-sed -i "s#homedir#${HOME}#g"  $0/rsyslog.rb
+script_path="`dirname \"$0\"`"
+sed -i "s#homedir#${HOME}#g"  $script_path/rsyslog.rb
