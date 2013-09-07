@@ -1,0 +1,34 @@
+#!/bin/bash
+echo "Update"
+sudo apt-get update
+
+echo "Install some packages"
+
+sudo apt-get install vim git tmux -y
+
+echo "Install RVM"
+
+\curl -L https://get.rvm.io | bash -s stable --ruby
+
+echo "Source RVM"
+source .rvm/scripts/rvm
+
+echo "Install chef"
+
+gem install chef --no-ri --no-rdoc
+
+echo "Clone drone code"
+
+git clone https://github.com/mamluka/SpeedyMailerCLI.git
+
+echo "Clone Cookbooks"
+
+git clone https://github.com/mamluka/SpeedyMailerCLI-Cookbooks.git
+
+echo "Copy chef solo files"
+
+cd SpeedyMailerCLI-Cookbooks && ruby setup.rb <%= @drone_domain %> <%= @master_domain %> && cd ..
+
+echo "Run chef solo"
+
+rvmsudo chef-solo -c solo.rb -j node.json

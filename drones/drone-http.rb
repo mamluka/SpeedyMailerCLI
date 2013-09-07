@@ -19,7 +19,6 @@ get '/deal/:payload' do
                                        time: Time.now.to_i,
                                        time_human: Time.now.to_s,
                                        deal_url: deal_url,
-                                       drone_id: $config[:droneId],
                                        drone_domain: $config[:domain],
                                    })
 
@@ -40,7 +39,6 @@ get '/unsubscribe/:payload' do
                                               time: Time.now.to_i,
                                               time_human: Time.now.to_s,
                                               deal_url: deal_url,
-                                              drone_id: $config[:droneId],
                                               drone_domain: $config[:domain],
                                           })
 

@@ -5,10 +5,10 @@ include Clockwork
 
 logger = Logger.new('drone.log')
 
-drone_id = $config[:droneId]
+drone_domain = $config[:domain]
 
 handler do |job|
-  ReportDroneToMaster.perform_async drone_id
+  ReportDroneToMaster.perform_async drone_domain
   logger.info "Updated drone at #{Time.now}"
 end
 

@@ -56,7 +56,6 @@ STDIN.each do |line|
           time_in_trensmission: sending_event_match[0][7],
           status: sending_event_match[0][8],
           message: sending_event_match[0][9],
-          drone_id: $config[:droneId],
           drone_domain: $config[:domain],
           time: Time.now.to_i,
           time_human: Time.now.to_s
