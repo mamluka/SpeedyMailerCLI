@@ -1,10 +1,13 @@
-require 'sinatra'
+require 'sinatra/base'
 
-get '/install' do
-  content_type 'text/plain'
+class Installer< Sinatra::Base
 
-  @drone_domain = params[:droneDomain]
-  @master_domain = params[:masterDomain]
+  get '/install' do
+    content_type 'text/plain'
 
-  erb :install
+    @drone_domain = params[:droneDomain]
+    @master_domain = params[:masterDomain]
+
+    erb :install
+  end
 end
