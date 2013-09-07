@@ -1,4 +1,4 @@
-#!/usr/bin/env /home/davidmz/.rvm/rubies/ruby-2.0.0-p247/bin/ruby
+#!/usr/bin/env homedir/.rvm/rubies/ruby-2.0.0-p247/bin/ruby
 
 require 'sidekiq'
 require 'set'
