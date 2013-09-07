@@ -1,6 +1,6 @@
 require 'sinatra/base'
 
-class Installer< Sinatra::Base
+class Installer < Sinatra::Base
 
   get '/install' do
     content_type 'text/plain'
