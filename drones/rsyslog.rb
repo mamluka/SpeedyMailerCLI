@@ -37,8 +37,12 @@ STDIN.each do |line|
   sending_event = /:\s(.+?): to=<(.+?)>. relay=(.+?)\[.+?\].+?, delay=(.+?), delays=(.+?)\/(.+?)\/(.+?)\/(.+?),.+?status=(.+?)\s\(.+?\ssaid:\s(.+$)/
   sending_event_match = line.scan(sending_event)
 
+  logger.info "Match event #{sending_event_match}"
+
   creative_id_event = /\s(\w{10}):.+?Speedy-Creative-Id:\s(.+?)\s/
   creative_id_match = line.scan(creative_id_event)
+
+  logger.info "Match creative Id #{creative_id_match}"
 
   if creative_id_match.length > 0
     lru.put creative_id_match[0][0], creative_id_match[0][1]
