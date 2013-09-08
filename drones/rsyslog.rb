@@ -34,12 +34,12 @@ STDIN.each do |line|
 
   logger.info line
 
-  sending_event = /:\s(.+?): to=<(.+?)>. relay=(.+?)\[.+?\].+?, delay=(.+?), delays=(.+?)\/(.+?)\/(.+?)\/(.+?),.+?status=(.+?)\s\(.+?\ssaid:\s(.+$)/
+  sending_event = /:\s(.+?): to=<(.+?)>. relay=(.+?)\[.+?\].+?, delay=(.+?), delays=(.+?)\/(.+?)\/(.+?)\/(.+?),.+?status=(.+?)\s(.+$)/
   sending_event_match = line.scan(sending_event)
 
   logger.info "Match event #{sending_event_match}"
 
-  creative_id_event = /\s(\w{10}):.+?Speedy-Creative-Id:\s(.+?)\s/
+  creative_id_event = /:\s(\w+?):.+?Speedy-Creative-Id:\s(.+?)\s/
   creative_id_match = line.scan(creative_id_event)
 
   logger.info "Match creative Id #{creative_id_match}"
