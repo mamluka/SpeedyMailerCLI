@@ -6,3 +6,4 @@ gem 'sinatra'
 gem 'redis'
 gem "mongoid", "~> 3.0.0"
 gem 'thor'
+gem 'tire'

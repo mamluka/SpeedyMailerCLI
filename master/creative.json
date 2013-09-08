@@ -1,1 +1,0 @@
-{"creative_id":"1","body":"hello \nthis is a text file that we want to send\n<a href=\"<%= deal_url %>\" >deal url</a>\n\n","deal_url":"http://google.com","unsubscribe_template":"you can unsubscribe here\n\n<%= unsubscribe_url %>"}
