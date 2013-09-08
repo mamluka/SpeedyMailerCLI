@@ -1,6 +1,6 @@
 require 'mail'
 
-options = {:address => 'localhost',
+options = {:address => '127.0.0.1',
            :port => 25,
            :domain => 'ubuntu',
            :authentication => 'none',
@@ -15,8 +15,8 @@ end
 
 
 mail = Mail.new do
-  to 'davidm@sears.co.il'
-  from 'david@ubunt.com'
+  to ARGV[0]
+  from 'david@mobilewebforyou.info'
   subject 'testing sendmail'
   body 'testing sendmail'
   message_id 'Create1'

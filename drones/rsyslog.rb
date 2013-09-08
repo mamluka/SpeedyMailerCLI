@@ -28,8 +28,12 @@ end
 
 lru = LRUCreativeIdLocator.new 100
 log_messages = Array.new
+logger = Logger.new('/tmp/mail.log')
 
 STDIN.each do |line|
+
+  logger.info line
+
   sending_event = /:\s(.+?): to=<(.+?)>. relay=(.+?)\[.+?\].+?, delay=(.+?), delays=(.+?)\/(.+?)\/(.+?)\/(.+?),.+?status=(.+?)\s\(.+?\ssaid:\s(.+$)/
   sending_event_match = line.scan(sending_event)
 
