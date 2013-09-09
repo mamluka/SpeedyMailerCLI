@@ -75,10 +75,12 @@ STDIN.each do |line|
 
   end
 
-  if log_messages.length == 10
-    IndexDroneSendingStats.perform_async log_messages
-    log_messages.clear
+  if log_messages.length == 1
     logger.info 'Send indexing job'
+    IndexDroneSendingStats.perform_async log_messages
+    logger.info 'Finish Send indexing job'
+    log_messages.clear
+
   end
 
 end

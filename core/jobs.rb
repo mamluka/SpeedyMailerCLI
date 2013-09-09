@@ -1,3 +1,5 @@
+ENV['REDIS_URL'] = "redis://#{$config[:master]}:6379/0"
+
 require 'sidekiq'
 
 class ReportDroneToMaster
