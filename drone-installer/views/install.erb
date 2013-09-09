@@ -11,7 +11,8 @@ echo "Install RVM"
 \curl -L https://get.rvm.io | bash -s stable --ruby
 
 echo "Source RVM"
-source .rvm/scripts/rvm
+test -f .rvm/scripts/rvm && source .rvm/scripts/rvm
+test -f /usr/local/rvm/scripts/rvm && source /usr/local/rvm/scripts/rvm
 
 echo "Install chef"
 
