@@ -3,3 +3,4 @@ config.json
 drones/tests/*
 *.log
 *.txt
+master/archive/*
