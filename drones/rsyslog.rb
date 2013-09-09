@@ -34,14 +34,19 @@ STDIN.each do |line|
 
   logger.info line
 
-  sending_event = /:\s(.+?): to=<(.+?)>. relay=(.+?)\[.+?\].+?, delay=(.+?), delays=(.+?)\/(.+?)\/(.+?)\/(.+?),.+?status=(.+?)\s\(.+?\ssaid:\s(.+$)/
+  sending_event = /:\s(.+?): to=<(.+?)>. relay=(.+?)\[.+?\].+?, delay=(.+?), delays=(.+?)\/(.+?)\/(.+?)\/(.+?),.+?status=(.+?)\s(.+$)/
   sending_event_match = line.scan(sending_event)
 
-  creative_id_event = /\s(\w{10}):.+?Speedy-Creative-Id:\s(.+?)\s/
+  logger.info "Match event #{sending_event_match}"
+
+  creative_id_event = /:\s(\w+?):.+?Speedy-Creative-Id:\s(.+?)\s/
   creative_id_match = line.scan(creative_id_event)
+
+  logger.info "Match creative Id #{creative_id_match}"
 
   if creative_id_match.length > 0
     lru.put creative_id_match[0][0], creative_id_match[0][1]
+    logger.info "Matched #{creative_id_match[0][0]} to #{creative_id_match[0][1]}"
   end
 
   if sending_event_match.length > 0
@@ -64,13 +69,18 @@ STDIN.each do |line|
           time: Time.now.to_i,
           time_human: Time.now.to_s
       }
+
+      logger.info "Logged email to #{sending_event_match[0][1]} with status #{sending_event_match[0][8]} buffer size is #{log_messages.length}"
     end
 
   end
 
-  if log_messages.length == 10
+  if log_messages.length == 1
+    logger.info 'Send indexing job'
     IndexDroneSendingStats.perform_async log_messages
+    logger.info 'Finish Send indexing job'
     log_messages.clear
+
   end
 
 end
