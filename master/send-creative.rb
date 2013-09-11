@@ -46,7 +46,7 @@ class DomainGroupsLoader
 end
 
 class Sending
-  def scheduled_sending(creative_id, domain_groups)
+  def scheduled_sending(creative_id, domain_groups, interval)
 
     handler do |job|
 
@@ -60,16 +60,16 @@ class Sending
 
     end
 
-    every 20.seconds, 'send.domain'
+    every interval.minutes, 'send.domain'
 
     Clockwork::run
   end
 end
 
 class SendCreative < Thor
-  desc 'send creativeId emailsFile', 'Start a queue to all drones sending out creative to the email list'
+  desc 'send creativeId emailsFile interval(min)', 'Start a queue to all drones sending out creative to the email list'
 
-  def send(creative_id=1, email_list='emails.csv')
+  def send(creative_id=1, email_list='emails.csv', interval = 30)
     loader = DomainGroupsLoader.new
     domain_groups = loader.load email_list
 
