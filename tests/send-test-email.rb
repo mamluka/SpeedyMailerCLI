@@ -24,4 +24,6 @@ end
 
 mail.header['Speedy-Creative-Id'] = '1'
 
+p mail.to_s
+
 mail.deliver!

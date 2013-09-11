@@ -3,6 +3,7 @@ require 'json'
 require 'base64'
 require 'erb'
 require 'ostruct'
+require 'mail'
 
 require_relative 'drone-config'
 require_relative 'creative'
@@ -28,7 +29,25 @@ class Drone
       whole_email= render_creative_template creative[:body], email_template_hash
     end
 
-    File.open(File.dirname(__FILE__) + '/tests/' + creative_id + '_' + email, 'w') { |f| f.write(whole_email) }
+    from_prefix = creative[:from_prefix]
+    from_name = creative[:from_name]
+
+    mail = Mail.new do
+      to email
+      from "<#{from_name}>#{from_prefix}@mobilewebforyou.info"
+      subject creative[:subject]
+      body whole_email
+    end
+
+    mail.header['Speedy-Creative-Id'] = creative_id
+
+
+    if not ENV['DRONE_DEBUG'].nil?
+      File.open(File.dirname(__FILE__) + '/tests/' + creative_id + '_' + email, 'w') { |f| f.write(mail.to_s) }
+    else
+      mail.deliver!
+    end
+
   end
 
   def create_unsubscribe_url(creative_id, email)
@@ -49,6 +68,21 @@ class Drone
 
     renderer = ERB.new template
     renderer.result(opts.instance_eval { binding })
+  end
+
+  def config_smpt
+    options = {:address => '127.0.0.1',
+               :port => 25,
+               :domain => $config[:domain],
+               :authentication => 'none',
+               :ssl => false,
+               :enable_starttls_auto => false
+    }
+
+
+    Mail.defaults do
+      delivery_method :smtp, options
+    end
   end
 
 end

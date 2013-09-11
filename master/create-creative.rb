@@ -46,10 +46,31 @@ class CreateCreative < Thor
 
   desc 'unsubscribe_url url CreativeFilename', 'Adds unsubscribe url'
 
-  def unsubscribe_url(unsubscribe_url,creative_file)
+  def unsubscribe_url(unsubscribe_url, creative_file)
     creative = parse_creative_file(creative_file)
 
     creative[:unsubscribe_url] = unsubscribe_url
+
+    write_json(creative_file, creative)
+  end
+
+  desc 'from fromName fromPrefix CreativeFilename', 'Adds unsubscribe url'
+
+  def from(from_name, from_prefix, creative_file)
+    creative = parse_creative_file(creative_file)
+
+    creative[:from_name] = from_name
+    creative[:from_prefix] = from_prefix
+
+    write_json(creative_file, creative)
+  end
+
+  desc 'subject subject CreativeFilename', 'Adds unsubscribe url'
+
+  def subject(subject, creative_file)
+    creative = parse_creative_file(creative_file)
+
+    creative[:subject] = subject
 
     write_json(creative_file, creative)
   end
