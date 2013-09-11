@@ -76,7 +76,7 @@ class SendCreative < Thor
     domain_groups = loader.load email_list
 
     sending = Sending.new
-    sending.scheduled_sending creative_id, domain_groups, interval
+    sending.scheduled_sending creative_id, domain_groups, interval.to_i
   end
 
   desc 'drones', 'List active drones'
