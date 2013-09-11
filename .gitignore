@@ -5,3 +5,4 @@ drones/tests/*
 *.txt
 master/archive/*
 master/*.json
+master/lists/*
