@@ -71,21 +71,24 @@ new_record.data = 'mail.' + my_domain
 new_record.aux = '5'
 puts new_record.save
 
+#add spf
+new_record = zone.build_record
+new_record.record_type = 'TXT'
+new_record.name = ''
+new_record.data = "\"v=spf1 mx a\""
+puts new_record.save
 
 
 #add domain keys
-
 new_record = zone.build_record
 new_record.record_type = 'TXT'
 new_record.name = 'maildk._domainkey'
 new_record.data = "\"k=rsa; t=y; p=" + domain_keys_dns_entry + "\""
 puts new_record.save
 
-puts new_record.errors
-
 #add dkim keys
 new_record = zone.build_record
 new_record.record_type = 'TXT'
 new_record.name = 'mail._domainkey'
-new_record.data = "\"" +  open_dkim_dns_entry + "\""
+new_record.data = "\"" + open_dkim_dns_entry + "\""
 puts new_record.save
