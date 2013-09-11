@@ -79,8 +79,9 @@ class SendCreative < Thor
   option :all, type: :boolean
 
   def drones
-    Drone.each { |drone| options[:all] ? true : (Time.now - drone.live_at) < 300 }
+    Drone
     .each { |drone|
+      next unless options[:all] ? true : (Time.now - drone.live_at) < 300
       p "#{drone.drone_id} was last live at #{drone.live_at}"
     }
   end
