@@ -51,9 +51,6 @@ class Sending
     handler do |job|
 
       Drone.each { |drone|
-
-        p drone.drone_id
-
         domain_groups.each { |k, v|
           Sidekiq::Client.push('queue' => drone.drone_id, 'class' => SendCreativeByDrone, 'args' => [creative_id, v.shift])
         }
@@ -79,9 +76,13 @@ class SendCreative < Thor
   end
 
   desc 'drones', 'List active drones'
+  option :all, type: :boolean
 
   def drones
-
+    Drone.each { |drone| options[:all] ? true : (Time.now - drone.live_at) < 300 }
+    .each { |drone|
+      p "#{drone.drone_id} was last live at #{drone.live_at}"
+    }
   end
 end
 
