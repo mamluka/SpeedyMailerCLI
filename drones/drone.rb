@@ -34,7 +34,7 @@ class Drone
 
     mail = Mail.new do
       to email
-      from "<#{from_name}> #{from_prefix}@mobilewebforyou.info"
+      from "#{from_name} <#{from_prefix}@#{$config[:domain]}>"
       subject creative[:subject]
       body whole_email
     end
