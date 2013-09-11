@@ -51,6 +51,8 @@ class Sending
     handler do |job|
 
       Drone.each { |drone|
+        next if (Time.now - drone.live_at) > 300
+
         domain_groups.each { |k, v|
           next if v.empty?
 
