@@ -36,7 +36,10 @@ class Drone
       to email
       from "#{from_name} <#{from_prefix}@#{$config[:domain]}>"
       subject creative[:subject]
-      body whole_email
+
+      html_part do
+        body whole_email
+      end
     end
 
     mail.header['Speedy-Creative-Id'] = creative_id
