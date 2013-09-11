@@ -13,11 +13,22 @@ class Drone
     creative = Creative.get creative_id
 
     deal_url = create_deal_url creative_id, email
-    unsubscribe_template = render_creative_template creative[:unsubscribe_template], {unsubscribe_url: create_unsubscribe_url(creative_id, email)}
 
-    email_body = render_creative_template creative[:body], {deal_url: deal_url}
+    unsubscribe_template = creative[:unsubscribe_template]
+    if not unsubscribe_template.nil?
+      rendered_unsubscribe_template = render_creative_template unsubscribe_template, {unsubscribe_url: create_unsubscribe_url(creative_id, email)}
+      email_body = render_creative_template creative[:body], {deal_url: deal_url}
+      whole_email = email_body + rendered_unsubscribe_template
+    else
+      email_template_hash = {
+          deal_url: deal_url,
+          unsubscribe_url: create_unsubscribe_url(creative_id, email)
+      }
 
-    File.open(File.dirname(__FILE__) + '/tests/' + creative_id + '_' + email, 'w') { |f| f.write(email_body + unsubscribe_template) }
+      whole_email= render_creative_template creative[:body], email_template_hash
+    end
+
+    File.open(File.dirname(__FILE__) + '/tests/' + creative_id + '_' + email, 'w') { |f| f.write(whole_email) }
   end
 
   def create_unsubscribe_url(creative_id, email)

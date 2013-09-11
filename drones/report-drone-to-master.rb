@@ -12,4 +12,4 @@ handler do |job|
   logger.info "Updated drone at #{Time.now}"
 end
 
-every 2.seconds, 'report.drone'
+every 60.seconds, 'report.drone'

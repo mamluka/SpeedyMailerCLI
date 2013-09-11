@@ -52,6 +52,8 @@ class Sending
 
       Drone.each { |drone|
         domain_groups.each { |k, v|
+          next if v.empty?
+
           Sidekiq::Client.push('queue' => drone.drone_id, 'class' => SendCreativeByDrone, 'args' => [creative_id, v.shift])
         }
       }

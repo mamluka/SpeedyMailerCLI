@@ -44,7 +44,14 @@ class DroneSite < Sinatra::Base
                                                 drone_domain: $config[:domain],
                                             })
 
-    "The email address #{payload[1]} was successfully unsubscribe"
+    unsubscribe_url = creative[:unsubscribe_url]
+
+    if not unsubscribe_url.nil?
+      redirect to(unsubscribe_url), 303
+    else
+      "The email address #{payload[1]} was successfully unsubscribe"
+    end
+
   end
 
 end

@@ -4,3 +4,4 @@ drones/tests/*
 *.log
 *.txt
 master/archive/*
+master/*.json
