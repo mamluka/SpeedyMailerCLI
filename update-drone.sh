@@ -1,3 +1,5 @@
+source .bash_profile
+source .rvm/scripts/rvm
 sudo service rsyslog stop
 tmux kill-session -t drone
 git reset --hard
