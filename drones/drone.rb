@@ -58,8 +58,10 @@ class Drone
           unsubscribe_url: create_unsubscribe_url(creative_id, email)
       }
 
-      render_creative_template creative[body_type_key], email_template_hash
+      whole_email = render_creative_template creative[body_type_key], email_template_hash
     end
+
+    whole_email
   end
 
   def create_unsubscribe_url(creative_id, email)
