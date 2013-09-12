@@ -12,6 +12,7 @@ require_relative 'creative'
 class Drone
   def send(creative_id, email)
 
+    creative = Creative.get creative_id
 
     from_prefix = creative[:from_prefix]
     from_name = creative[:from_name]
