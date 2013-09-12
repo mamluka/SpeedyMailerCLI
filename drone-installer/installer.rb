@@ -13,6 +13,7 @@ class Installer < Sinatra::Base
   end
 
   get '/create-drone' do
+    content_type 'text/plain'
     config = JSON.parse(File.read(File.dirname(__FILE__) + '/config.json'), symbolize_names: true)
 
     @password = config[:password]
