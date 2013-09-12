@@ -14,12 +14,22 @@ class CreateCreative < Thor
     write_json(creative_file, creative)
   end
 
-  desc 'body BodyFilename CreativeFilename', 'Adds body text'
+  desc 'body_html BodyFilename CreativeFilename', 'Adds body html'
 
-  def body(body_file, creative_file = 'creative.json')
+  def body_html(body_file, creative_file = 'creative.json')
     creative = parse_creative_file(creative_file)
 
-    creative[:body] = File.read(body_file)
+    creative[:body_html] = File.read(body_file)
+
+    write_json(creative_file, creative)
+  end
+
+  desc 'body_text BodyFilename CreativeFilename', 'Adds body text'
+
+  def body_text(body_file, creative_file = 'creative.json')
+    creative = parse_creative_file(creative_file)
+
+    creative[:body_text] = File.read(body_file)
 
     write_json(creative_file, creative)
   end
@@ -34,12 +44,22 @@ class CreateCreative < Thor
     write_json(creative_file, creative)
   end
 
-  desc 'unsubscribe templateFile CreativeFilename', 'Adds an unsubscribe template'
+  desc 'unsubscribe_html templateFile CreativeFilename', 'Adds an unsubscribe html template'
 
-  def unsubscribe(template_file, creative_file)
+  def unsubscribe_html(template_file, creative_file)
     creative = parse_creative_file(creative_file)
 
-    creative[:unsubscribe_template] = File.read(template_file)
+    creative[:unsubscribe_template_html] = File.read(template_file)
+
+    write_json(creative_file, creative)
+  end
+
+  desc 'unsubscribe_text templateFile CreativeFilename', 'Adds an unsubscribe text template'
+
+  def unsubscribe_text(template_file, creative_file)
+    creative = parse_creative_file(creative_file)
+
+    creative[:unsubscribe_template_html] = File.read(template_file)
 
     write_json(creative_file, creative)
   end

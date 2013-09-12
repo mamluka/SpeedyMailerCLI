@@ -11,23 +11,7 @@ require_relative 'creative'
 
 class Drone
   def send(creative_id, email)
-    creative = Creative.get creative_id
 
-    deal_url = create_deal_url creative_id, email
-
-    unsubscribe_template = creative[:unsubscribe_template]
-    if not unsubscribe_template.nil?
-      rendered_unsubscribe_template = render_creative_template unsubscribe_template, {unsubscribe_url: create_unsubscribe_url(creative_id, email)}
-      email_body = render_creative_template creative[:body], {deal_url: deal_url}
-      whole_email = email_body + rendered_unsubscribe_template
-    else
-      email_template_hash = {
-          deal_url: deal_url,
-          unsubscribe_url: create_unsubscribe_url(creative_id, email)
-      }
-
-      whole_email= render_creative_template creative[:body], email_template_hash
-    end
 
     from_prefix = creative[:from_prefix]
     from_name = creative[:from_name]
@@ -38,7 +22,11 @@ class Drone
       subject creative[:subject]
 
       html_part do
-        body whole_email
+        body create_email_body(:body_html, creative_id, email)
+      end
+
+      text_part do
+        body create_email_body(:body_text, creative_id, email)
       end
     end
 
@@ -51,6 +39,26 @@ class Drone
       mail.deliver!
     end
 
+  end
+
+  def create_email_body(body_type_key, creative_id, email)
+
+    creative = Creative.get creative_id
+    deal_url = create_deal_url creative_id, email
+
+    unsubscribe_template = creative[:unsubscribe_template]
+    if not unsubscribe_template.nil?
+      rendered_unsubscribe_template = render_creative_template unsubscribe_template, {unsubscribe_url: create_unsubscribe_url(creative_id, email)}
+      email_body = render_creative_template creative[body_type_key], {deal_url: deal_url}
+      whole_email = email_body + rendered_unsubscribe_template
+    else
+      email_template_hash = {
+          deal_url: deal_url,
+          unsubscribe_url: create_unsubscribe_url(creative_id, email)
+      }
+
+      render_creative_template creative[body_type_key], email_template_hash
+    end
   end
 
   def create_unsubscribe_url(creative_id, email)

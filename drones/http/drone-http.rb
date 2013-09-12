@@ -52,6 +52,15 @@ class DroneSite < Sinatra::Base
       "The email address #{payload[1]} was successfully unsubscribe"
     end
 
+
+
+  end
+
+  get '/small-logo/:payload' do
+
+
+
+    send_file(File.dirname(__FILE__) + '/static/logo.png')
   end
 
 end

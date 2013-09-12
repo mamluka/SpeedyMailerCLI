@@ -1,0 +1,4 @@
+sudo su -c "useradd drone -s /bin/bash -m -G sudo"
+sudo chpasswd << 'END'
+drone:<%= @password %>
+END
