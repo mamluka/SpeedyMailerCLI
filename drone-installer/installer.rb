@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'json'
 
 class Installer < Sinatra::Base
 
