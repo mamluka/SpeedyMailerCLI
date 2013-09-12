@@ -33,7 +33,6 @@ class Drone
 
     mail.header['Speedy-Creative-Id'] = creative_id
 
-
     if not ENV['DRONE_DEBUG'].nil?
       File.open(File.dirname(__FILE__) + '/tests/' + creative_id + '_' + email, 'w') { |f| f.write(mail.to_s) }
     else
