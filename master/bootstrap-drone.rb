@@ -25,7 +25,7 @@ class Bootstrap < Thor
 
       channel = ssh.open_channel do |ch|
         channel.request_pty do |ch, success|
-          raise "I can't get pty rquest" unless success
+          raise "I can't get pty request" unless success
 
           ch.exec "\\curl -L 'http://#{master_ip}:8080/install?droneDomain=#{drone_domain}&masterDomain=#{master_ip}' | bash" do |ch, success|
             raise 'could not execute command' unless success
@@ -49,6 +49,41 @@ class Bootstrap < Thor
       channel.wait
     end
   end
+
+  desc 'update droneIp dronePassword','Update code for a given drone includes a restart'
+  def update(drone_ip, password)
+
+    Net::SSH.start(drone_ip, 'drone', :password => password) do |ssh|
+
+      p 'Running update script'
+
+      channel = ssh.open_channel do |ch|
+        channel.request_pty do |ch, success|
+          raise "I can't get pty request" unless success
+
+          ch.exec 'cd SpeedyMailerCLI && bash update-drone.sh' do |ch, success|
+            raise 'could not execute command' unless success
+
+            ch.on_data do |c, data|
+              if data.inspect.include?('[sudo]') || data.inspect.include?('password required for')
+                channel.send_data("#{password}\n")
+                sleep 1
+              end
+              $stdout.print data
+            end
+
+            ch.on_extended_data do |c, type, data|
+              $stderr.print data
+            end
+
+            ch.on_close { puts 'Drone is updated and running' }
+          end
+        end
+      end
+      channel.wait
+    end
+  end
+
 end
 
 Bootstrap.start
