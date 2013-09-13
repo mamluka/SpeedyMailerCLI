@@ -79,6 +79,23 @@ class SendCreative < Thor
     sending.scheduled_sending creative_id, domain_groups, interval.to_i
   end
 
+  desc 'test_send creativeId Email/', 'List active drones'
+
+  def test_send(creative_id, email)
+
+    domain_groups = Hash.new
+    domain_groups[:other] = []
+
+    if email.include?(',')
+      domain_groups[:other] << email.split(',')
+    else
+      domain_groups[:other] << email
+    end
+
+    sending = Sending.new
+    sending.scheduled_sending creative_id, domain_groups, interval.to_i
+  end
+
   desc 'drones', 'List active drones'
   option :all, type: :boolean
 

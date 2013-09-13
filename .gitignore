@@ -6,3 +6,4 @@ drones/tests/*
 master/archive/*
 master/*.json
 master/lists/*
+master/*.csv

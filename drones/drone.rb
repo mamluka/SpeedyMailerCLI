@@ -75,7 +75,7 @@ class Drone
 
   def create_url(creative_id, email, route)
     payload = Base64.encode64("#{creative_id},#{email}")
-    "#{$config[:domain]}/#{route}/#{payload}"
+    "http://#{$config[:domain]}/#{route}/#{payload}"
   end
 
   def render_creative_template(template, values)
