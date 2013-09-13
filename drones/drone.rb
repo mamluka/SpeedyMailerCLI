@@ -47,16 +47,25 @@ class Drone
 
     creative = Creative.get creative_id
     deal_url = create_deal_url creative_id, email
+    open_tracking_url = create_open_track_url creative_id, email
 
     unsubscribe_template = creative[:unsubscribe_template]
     if not unsubscribe_template.nil?
       rendered_unsubscribe_template = render_creative_template unsubscribe_template, {unsubscribe_url: create_unsubscribe_url(creative_id, email)}
-      email_body = render_creative_template creative[body_type_key], {deal_url: deal_url}
-      whole_email = email_body + rendered_unsubscribe_template
-    else
+
       email_template_hash = {
           deal_url: deal_url,
-          unsubscribe_url: create_unsubscribe_url(creative_id, email)
+          open_tracking_url: open_tracking_url
+      }
+
+      email_body = render_creative_template creative[body_type_key], email_template_hash
+      whole_email = email_body + rendered_unsubscribe_template
+    else
+
+      email_template_hash = {
+          deal_url: deal_url,
+          unsubscribe_url: create_unsubscribe_url(creative_id, email),
+          open_tracking_url: open_tracking_url
       }
 
       whole_email = render_creative_template creative[body_type_key], email_template_hash
@@ -67,6 +76,10 @@ class Drone
 
   def create_unsubscribe_url(creative_id, email)
     create_url(creative_id, email, 'unsubscribe')
+  end
+
+  def create_open_track_url(creative_id, email)
+    create_url(creative_id, email, 'small-logo')
   end
 
   def create_deal_url(creative_id, email)
