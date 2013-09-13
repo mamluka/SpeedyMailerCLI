@@ -62,7 +62,7 @@ class DroneSite < Sinatra::Base
 
     deal_url = creative[:deal_url]
 
-    IndexCreativeClick.perform_async({
+    IndexCreativeOpen.perform_async({
                                          action: 'open',
                                          creative_id: payload[0].to_i,
                                          recipient: payload[1],
