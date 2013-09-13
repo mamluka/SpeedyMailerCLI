@@ -24,12 +24,16 @@ class Drone
       from "#{from_name} <#{from_prefix}@#{$config[:domain]}>"
       subject creative[:subject]
 
-      html_part do
-        body body_html
+      if not creative[:body_html].nil?
+        html_part do
+          body body_html
+        end
       end
 
-      text_part do
-        body body_text
+      if not creative[:body_text].nil?
+        text_part do
+          body body_text
+        end
       end
     end
 
