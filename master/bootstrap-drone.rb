@@ -101,7 +101,7 @@ class Bootstrap < Thor
         channel.request_pty do |ch, success|
           raise "I can't get pty request" unless success
 
-          ch.exec 'tmux kill-session drone' do |ch, success|
+          ch.exec 'tmux kill-session -t drone' do |ch, success|
             raise 'could not execute command' unless success
 
             ch.on_data do |c, data|
