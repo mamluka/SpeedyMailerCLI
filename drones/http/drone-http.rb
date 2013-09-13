@@ -53,12 +53,24 @@ class DroneSite < Sinatra::Base
     end
 
 
-
   end
 
   get '/small-logo/:payload' do
 
+    payload = Base64.decode64(params[:payload]).split(',')
+    creative = Creative.get payload[0]
 
+    deal_url = creative[:deal_url]
+
+    IndexCreativeClick.perform_async({
+                                         action: 'open',
+                                         creative_id: payload[0].to_i,
+                                         recipient: payload[1],
+                                         time: Time.now.to_i,
+                                         time_human: Time.now.to_s,
+                                         deal_url: deal_url,
+                                         drone_domain: $config[:domain],
+                                     })
 
     send_file(File.dirname(__FILE__) + '/static/logo.png')
   end

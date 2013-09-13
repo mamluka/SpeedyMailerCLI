@@ -55,6 +55,21 @@ class IndexCreativeClick
 
 end
 
+class IndexCreativeOpen
+  include Sidekiq::Worker
+  sidekiq_options :queue => :master
+
+  def perform(open_data)
+    require 'tire'
+
+    Tire.index 'marketing' do
+      store open_data
+    end
+
+  end
+
+end
+
 class IndexRecipientUnsubscribe
   include Sidekiq::Worker
   sidekiq_options :queue => :master
