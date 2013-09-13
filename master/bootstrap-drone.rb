@@ -6,10 +6,15 @@ require 'net/http'
 class Bootstrap < Thor
   desc 'bootstrap droneIp dronePassword droneDomain ', 'Bootstraps a drone using SSH'
 
-  def bootstrap(drone_ip, password, drone_domain)
+  def bootstrap(drone_ip, password)
     master_ip = Net::HTTP.get(URI.parse('http://ipecho.net/plain'))
-
     p "Found master ip to be: #{master_ip}"
+
+    drone_domain = `/usr/bin/dig +noall +answer -x #{drone_ip} | awk '{$5=substr($5,1,length($5)-1); print $5}' | tr  -d '\n'`
+
+    'Reverse dns must be setup' if drone_domain.nil?
+
+    p "Found reverse dns for drone at #{drone_domain}"
 
     Net::SSH.start(drone_ip, 'root', :password => password) do |ssh|
       p 'Install curl'
@@ -50,7 +55,8 @@ class Bootstrap < Thor
     end
   end
 
-  desc 'update droneIp dronePassword','Update code for a given drone includes a restart'
+  desc 'update droneIp dronePassword', 'Update code for a given drone includes a restart'
+
   def update(drone_ip, password)
 
     Net::SSH.start(drone_ip, 'drone', :password => password) do |ssh|
