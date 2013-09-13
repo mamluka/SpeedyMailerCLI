@@ -16,8 +16,9 @@ class Drone
 
     from_prefix = creative[:from_prefix]
     from_name = creative[:from_name]
-    body_html = create_email_body(:body_html, creative_id, email)
-    body_text = create_email_body(:body_text, creative_id, email)
+
+    body_html = create_email_body(:body_html, creative_id, email) if not creative[:body_html].nil?
+    body_text = create_email_body(:body_text, creative_id, email) if not creative[:body_text].nil?
 
     mail = Mail.new do
       to email
@@ -25,12 +26,14 @@ class Drone
       subject creative[:subject]
 
       if not creative[:body_html].nil?
+
         html_part do
           body body_html
         end
       end
 
       if not creative[:body_text].nil?
+
         text_part do
           body body_text
         end
