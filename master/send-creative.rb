@@ -60,6 +60,10 @@ class Sending
         }
       }
 
+      if domain_groups.all? { |k, v| v.empty? }
+        puts 'Done sending all emails... exiting'
+        exit 0
+      end
     end
 
     every interval.minutes, 'send.domain'
@@ -93,7 +97,7 @@ class SendCreative < Thor
     end
 
     sending = Sending.new
-    sending.scheduled_sending creative_id, domain_groups, interval.to_i
+    sending.scheduled_sending creative_id, domain_groups, 60
   end
 
   desc 'drones', 'List active drones'
