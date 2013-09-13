@@ -90,6 +90,41 @@ class Bootstrap < Thor
     end
   end
 
-end
+  desc 'stop droneIp dronePassword', 'Stop service for that drone'
+  def stop(drone_ip, password)
 
-Bootstrap.start
+    Net::SSH.start(drone_ip, 'drone', :password => password) do |ssh|
+
+      p 'Stopping drone'
+
+      channel = ssh.open_channel do |ch|
+        channel.request_pty do |ch, success|
+          raise "I can't get pty request" unless success
+
+          ch.exec 'tmux kill-session drone' do |ch, success|
+            raise 'could not execute command' unless success
+
+            ch.on_data do |c, data|
+              if data.inspect.include?('[sudo]') || data.inspect.include?('password required for')
+                channel.send_data("#{password}\n")
+                sleep 1
+              end
+              $stdout.print data
+            end
+
+            ch.on_extended_data do |c, type, data|
+              $stderr.print data
+            end
+
+            ch.on_close { puts 'Drone is stopped' }
+          end
+        end
+      end
+      channel.wait
+    end
+
+  end
+
+  end
+
+  Bootstrap.start
