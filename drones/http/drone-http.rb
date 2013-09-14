@@ -75,4 +75,9 @@ class DroneSite < Sinatra::Base
     send_file(File.dirname(__FILE__) + '/static/logo.png')
   end
 
+  get 'admin/postfix-log' do
+
+  end
+
+
 end
