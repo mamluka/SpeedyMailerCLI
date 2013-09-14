@@ -63,16 +63,19 @@ class Stats < Thor
     if options[:r]
       $stdout.puts 'List of the last 50 actions'
       result.results.map { |x| x.to_hash }.each { |x|
-        $stdout.puts "#{x[:recipient]} did a #{x[:action]}"
+        $stdout.puts "#{x[:recipient]} did a #{x[:action]} originated at #{x[:drone_domain]}"
       }
     end
 
     $stdout.puts 'Actions taken on drones:'
+
     result.results.facets['drones']['terms'].each do |facet|
       $stdout.puts "#{facet['term']}: #{facet['count']}"
     end
 
     $stdout.puts 'Actions distribution:'
+    $stdout.puts "Total actions #{result.results.facets['actions']['total']}"
+
     result.results.facets['actions']['terms'].each do |facet|
       $stdout.puts "#{facet['term']}: #{facet['count']}"
     end
