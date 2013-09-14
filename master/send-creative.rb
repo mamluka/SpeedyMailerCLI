@@ -102,7 +102,7 @@ class SendCreative < Thor
 
   desc 'drones', 'List active drones'
   option :all, type: :boolean
-  option :ip, type :boolean
+  option :ip, type: :boolean
 
   def drones
     Drone
