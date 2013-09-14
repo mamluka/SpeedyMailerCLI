@@ -2,6 +2,7 @@
 require 'thor'
 require 'redis'
 require 'net/dns'
+require 'tire'
 
 class Lists < Thor
   desc 'clean emailFile', 'Clean an email file'
@@ -25,6 +26,22 @@ class Lists < Thor
       $stdout.print line + "\n"
 
     }
+  end
+
+  desc 'processed creativeId', 'List all emails that were sent,bounced or deferred for a given creativeId'
+
+  def processed(creative_id)
+    result = Tire.search('stats') do
+      query do
+        term :creative_id, creative_id
+      end
+      size 1000000
+      fields [:recipient]
+    end
+
+    result.results.map { |x| x.to_hash }.uniq { |x| x[:recipient] }.each do |x|
+      $stdout.puts x[:recipient]
+    end
   end
 end
 

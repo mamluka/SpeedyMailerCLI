@@ -83,7 +83,7 @@ class SendCreative < Thor
     sending.scheduled_sending creative_id, domain_groups, interval.to_i
   end
 
-  desc 'test_send creativeId Email/', 'List active drones'
+  desc 'test_send creativeId Email', 'List active drones'
 
   def test_send(creative_id, email)
 
