@@ -49,6 +49,8 @@ class Stats < Thor
         size 0
       end
 
+      sort { by :time, 'desc' }
+
       facet 'drones' do
         terms :drone_domain
       end
