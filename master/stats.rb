@@ -4,11 +4,19 @@ require 'tire'
 
 class Stats < Thor
   desc 'sends creativeId', 'List sends'
+  option :by, type: :string
 
   def sends(creative_id)
+    by_drone = options[:by]
+
     result = Tire.search('stats') do
       query do
-        term :creative_id, creative_id
+        boolean do
+          must do
+            term :creative_id, creative_id
+            term :drone_domain, by_drone if not by_drone.nil?
+          end
+        end
       end
       size 0
 
