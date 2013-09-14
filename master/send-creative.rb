@@ -102,12 +102,17 @@ class SendCreative < Thor
 
   desc 'drones', 'List active drones'
   option :all, type: :boolean
+  option :ip, type :boolean
 
   def drones
     Drone
     .each { |drone|
       next unless options[:all] ? true : (Time.now - drone.live_at) < 300
-      p "#{drone.drone_id} was last live at #{drone.live_at}"
+      if not options[:ip]
+        $stdout.puts "#{drone.drone_id} was last live at #{drone.live_at}"
+      else
+        $stdout.puts `/usr/bin/dig +noall +answer #{drone.drone_id} A | awk '{$5=substr($5,1,length($5)-1); print $5}' | tr  -d '\n'`
+      end
     }
   end
 end

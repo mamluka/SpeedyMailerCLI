@@ -26,6 +26,7 @@ GEM
       tzinfo (~> 0.3.22)
     moped (1.5.1)
     multi_json (1.7.9)
+    net-dns (0.8.0)
     net-ssh (2.7.0)
     origin (1.1.0)
     rack (1.5.2)
@@ -66,6 +67,7 @@ PLATFORMS
 DEPENDENCIES
   clockwork
   mongoid (~> 3.0.0)
+  net-dns
   net-ssh
   redis
   sidekiq
