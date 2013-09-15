@@ -5,20 +5,28 @@ require 'tire'
 class Stats < Thor
   desc 'sends creativeId', 'List sends'
   option :by, type: :string
+  option :last, type: :numeric
+  option :status, type: :string
 
   def sends(creative_id)
     by_drone = options[:by]
-
+    last_sends = options[:last]
+    status = options[:status]
     result = Tire.search('stats') do
       query do
         boolean do
-          must do
-            term :creative_id, creative_id
-            term :drone_domain, by_drone if not by_drone.nil?
-          end
+          must { term :creative_id, creative_id }
+          must { term :drone_domain, by_drone } if not by_drone.nil?
+          must { term :status, status} if not status.nil?
         end
       end
-      size 0
+
+      if not last_sends.nil?
+        size last_sends
+      else
+        size 0
+      end
+
 
       facet 'drones' do
         terms :drone_domain
@@ -28,6 +36,15 @@ class Stats < Thor
         terms :status
       end
 
+      sort { by :time, 'desc' }
+    end
+
+    if not last_sends.nil?
+      result.results.map { |x| x.to_hash }.each { |x|
+        $stdout.puts x[:recipient]
+      }
+
+      exit 0
     end
 
     $stdout.puts 'Number of emails send by each drone:'
@@ -88,7 +105,6 @@ class Stats < Thor
       $stdout.puts "#{facet['term']}: #{facet['count']}"
     end
   end
-
 
 end
 

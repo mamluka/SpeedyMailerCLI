@@ -2,5 +2,5 @@ require "dnsbl/client"
 
 c = DNSBL::Client.new
 
-p c.lookup('211.150.99.133')
+p c.lookup('162.210.39.165')
 
