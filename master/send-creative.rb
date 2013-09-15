@@ -120,7 +120,12 @@ class SendCreative < Thor
 
       out_array << ip if options[:info].include? 'ip'
       out_array << drone.live_at if options[:info].include? 'live'
-      out_array << dnsbl_client.lookup(ip) if options[:info].include? 'dnsbl'
+
+      if options[:info].include? 'dnsbl'
+        lookup = dnsbl_client.lookup(ip)
+
+        out_array << lookup.empty? ? 'None' : lookup
+      end
 
       $stdout.puts out_array.join(' ')
     }
