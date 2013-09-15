@@ -7,7 +7,7 @@ class Stats < Thor
   option :by, type: :string
   option :last, type: :numeric
   option :status, type: :string
-  option :verbose, type: :string, enum: %w(drone)
+  option :verbose, type: :array, enum: %w(drone, ago)
 
   def sends(creative_id)
     by_drone = options[:by]
@@ -43,7 +43,8 @@ class Stats < Thor
     if not last_sends.nil?
       result.results.map { |x| x.to_hash }.each { |x|
         out = x[:recipient]
-        out = "#{out} #{x[:drone_domain]}" if options[:verbose] == 'drone'
+        out = "#{out} #{x[:drone_domain]}" if options[:verbose].include? 'drone'
+        out = "#{out} #{((Time.now.to_i - x[:time].to_i)/3600.0).round(1)}" if options[:verbose].include? 'ago'
         $stdout.puts out
       }
 
