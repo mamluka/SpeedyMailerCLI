@@ -111,7 +111,7 @@ class SendCreative < Thor
       if not options[:ip]
         $stdout.puts "#{drone.drone_id} was last live at #{drone.live_at}"
       else
-        $stdout.puts `/usr/bin/dig +noall +answer #{drone.drone_id} A | awk '{$5=substr($5,1,length($5)-1); print $5}' | tr  -d '\n'`
+        $stdout.puts `/usr/bin/dig +noall +answer #{drone.drone_id} A | awk '{$5=substr($5,1,length($5)); print $5}' | tr  -d '\n'`
       end
     }
   end
