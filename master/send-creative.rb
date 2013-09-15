@@ -124,7 +124,7 @@ class SendCreative < Thor
       if options[:info].include? 'dnsbl'
         lookup = dnsbl_client.lookup(ip)
 
-        out_array << lookup.empty? ? 'None' : lookup
+        out_array << (lookup.empty? ? 'None' : lookup.map { |x| x.meaning }.join(','))
       end
 
       $stdout.puts out_array.join(' ')
