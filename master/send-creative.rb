@@ -102,17 +102,27 @@ class SendCreative < Thor
 
   desc 'drones', 'List active drones'
   option :all, type: :boolean
-  option :ip, type: :boolean
+  option :info, type: :array, enum: %w{domain ip dnsbl live}, default: 'domain'
 
   def drones
+
+    require "dnsbl/client"
+
+    dnsbl_client = DNSBL::Client.new
+
     Drone
     .each { |drone|
       next unless options[:all] ? true : (Time.now - drone.live_at) < 300
-      if not options[:ip]
-        $stdout.puts "#{drone.drone_id} was last live at #{drone.live_at}"
-      else
-        $stdout.puts `/usr/bin/dig +noall +answer #{drone.drone_id} A | awk '{$5=substr($5,1,length($5)); print $5}' | tr  -d '\n'`
-      end
+      out_array = Array.new
+      out_array << drone.drone_id if options[:info].include? 'domain'
+
+      ip = `/usr/bin/dig +noall +answer #{drone.drone_id} A | awk '{$5=substr($5,1,length($5)); print $5}' | tr  -d '\n'` if options[:info].include?('ip') || options[:info].include?('dnsbl')
+
+      out_array << ip if options[:info].include? 'ip'
+      out_array << drone.live_at if options[:info].include? 'live'
+      out_array << dnsbl_client.lookup(ip) if options[:info].include? 'dnsbl'
+
+      $stdout.puts out_array.join(' ')
     }
   end
 end
