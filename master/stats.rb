@@ -7,6 +7,7 @@ class Stats < Thor
   option :by, type: :string
   option :last, type: :numeric
   option :status, type: :string
+  option :verbose, type: :string, enum: %w(drone)
 
   def sends(creative_id)
     by_drone = options[:by]
@@ -17,7 +18,7 @@ class Stats < Thor
         boolean do
           must { term :creative_id, creative_id }
           must { term :drone_domain, by_drone } if not by_drone.nil?
-          must { term :status, status} if not status.nil?
+          must { term :status, status } if not status.nil?
         end
       end
 
@@ -41,7 +42,9 @@ class Stats < Thor
 
     if not last_sends.nil?
       result.results.map { |x| x.to_hash }.each { |x|
-        $stdout.puts x[:recipient]
+        out = x[:recipient]
+        out = "#{out} #{x[:drone_domain]}" if options[:verbose] == 'drone'
+        $stdout.puts out
       }
 
       exit 0
