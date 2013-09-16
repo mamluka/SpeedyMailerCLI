@@ -55,8 +55,9 @@ class Sending
 
         domain_groups.each { |k, v|
           next if v.empty?
-
-          Sidekiq::Client.push('queue' => drone.drone_id, 'class' => SendCreativeByDrone, 'args' => [creative_id, v.shift])
+          recipient = v.shift
+          drone_id = drone.drone_id
+          send_to_specific_drone drone_id, creative_id, recipient
         }
       }
 
@@ -69,6 +70,10 @@ class Sending
     every interval.minutes, 'send.domain'
 
     Clockwork::run
+  end
+
+  def send_to_specific_drone(drone_id, creative_id, recipient)
+    Sidekiq::Client.push('queue' => drone_id, 'class' => SendCreativeByDrone, 'args' => [creative_id,])
   end
 end
 
@@ -83,21 +88,12 @@ class SendCreative < Thor
     sending.scheduled_sending creative_id, domain_groups, interval.to_i
   end
 
-  desc 'test_send creativeId Email', 'List active drones'
+  desc 'test_send drone_id creativeId Email', 'List active drones'
 
-  def test_send(creative_id, email)
-
-    domain_groups = Hash.new
-    domain_groups[:other] = []
-
-    if email.include?(',')
-      domain_groups[:other] << email.split(',')
-    else
-      domain_groups[:other] << email
-    end
+  def test_send(drone_id, creative_id, email)
 
     sending = Sending.new
-    sending.scheduled_sending creative_id, domain_groups, 60
+    sending.send_to_specific_drone drone_id, creative_id, email
   end
 
   desc 'drones', 'List active drones'
