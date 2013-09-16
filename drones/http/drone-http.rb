@@ -75,8 +75,14 @@ class DroneSite < Sinatra::Base
     send_file(File.dirname(__FILE__) + '/static/logo.png')
   end
 
-  get 'admin/postfix-log' do
+  get '/admin/postfix-log' do
+    'Not working right now'
+  end
 
+  get '/*' do
+
+    @domain = $config[:domain]
+    erb :home
   end
 
 

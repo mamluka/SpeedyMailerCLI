@@ -7,7 +7,7 @@ class Stats < Thor
   option :by, type: :string
   option :last, type: :numeric
   option :status, type: :string
-  option :verbose, type: :array, enum: %w(drone, ago)
+  option :verbose, type: :array, enum: %w(drone, ago),default: %w()
 
   def sends(creative_id)
     by_drone = options[:by]
