@@ -73,7 +73,7 @@ class Sending
   end
 
   def send_to_specific_drone(drone_id, creative_id, recipient)
-    Sidekiq::Client.push('queue' => drone_id, 'class' => SendCreativeByDrone, 'args' => [creative_id,])
+    Sidekiq::Client.push('queue' => drone_id, 'class' => SendCreativeByDrone, 'args' => [creative_id, recipient])
   end
 end
 
