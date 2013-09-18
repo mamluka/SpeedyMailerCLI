@@ -7,7 +7,7 @@ class Stats < Thor
   option :by, type: :string
   option :last, type: :numeric
   option :status, type: :string
-  option :verbose, type: :array, enum: %w(drone, ago),default: %w()
+  option :verbose, type: :array, enum: %w(domain, ago), default: %w()
 
   def sends(creative_id)
     by_drone = options[:by]
@@ -43,7 +43,7 @@ class Stats < Thor
     if not last_sends.nil?
       result.results.map { |x| x.to_hash }.each { |x|
         out = x[:recipient]
-        out = "#{out} #{x[:drone_domain]}" if options[:verbose].include? 'drone'
+        out = "#{out} #{x[:drone_domain]}" if options[:verbose].include? 'domain'
         out = "#{out} #{((Time.now.to_i - x[:time].to_i)/3600.0).round(1)}" if options[:verbose].include? 'ago'
         $stdout.puts out
       }
@@ -63,13 +63,21 @@ class Stats < Thor
   end
 
   desc 'clicks creativeId', 'List clicks opens and unsubscribes'
-  option :r, type: :boolean
+  option :recent, type: :boolean
+  option :action, type: :string
+  option :totals, type: :array
 
   def clicks(creative_id)
-    get_recipients = options[:r]
+
+    get_recipients = options[:recent]
+    action = options[:action]
+
     result = Tire.search('marketing') do
       query do
-        term :creative_id, creative_id
+        bool do
+          must { term :creative_id, creative_id }
+          must { term :action, action } if not action.nil?
+        end
       end
 
       if get_recipients
@@ -89,27 +97,50 @@ class Stats < Thor
       end
     end
 
-    if options[:r]
-      $stdout.puts 'List of the last 50 actions'
+    output = Array.new
+
+    if not options[:recent].nil?
       result.results.map { |x| x.to_hash }.each { |x|
-        $stdout.puts "#{x[:recipient]} did a #{x[:action]} originated at #{x[:drone_domain]}"
+        output << "#{x[:recipient]} did a #{x[:action]} originated at #{x[:drone_domain]}"
       }
     end
 
-    $stdout.puts 'Actions taken on drones:'
+    totals = options[:totals]
 
-    result.results.facets['drones']['terms'].each do |facet|
-      $stdout.puts "#{facet['term']}: #{facet['count']}"
+    if not totals.nil?
+
+      if totals.include? 'domains'
+        result.results.facets['drones']['terms'].each do |facet|
+          output << "#{facet['term']}: #{facet['count']}"
+        end
+      end
+
+      if totals.include? 'actions'
+        result.results.facets['actions']['terms'].each do |facet|
+          output << "#{facet['term']}: #{facet['count']}"
+        end
+      end
+
     end
 
-    $stdout.puts 'Actions distribution:'
-    $stdout.puts "Total actions #{result.results.facets['actions']['total']}"
+    output.each { |x| $stdout.puts x }
 
-    result.results.facets['actions']['terms'].each do |facet|
-      $stdout.puts "#{facet['term']}: #{facet['count']}"
-    end
+
   end
 
+  desc 'Report creativeId', 'Shows a action to send ratio reports'
+
+  def report(creative_id)
+
+  end
+
+  desc 'remove_tests', 'removes tests from the indexes'
+
+  def remove_tests
+    Tire.index 'stats' do
+      delete
+    end
+  end
 end
 
 Stats.start

@@ -15,6 +15,7 @@ GEM
       activesupport
       tzinfo (~> 0.3.35)
     connection_pool (1.1.0)
+    dnsbl-client (1.0.0)
     hashr (0.0.22)
     i18n (0.6.5)
     json (1.8.0)
@@ -66,10 +67,12 @@ PLATFORMS
 
 DEPENDENCIES
   clockwork
+  dnsbl-client
   mongoid (~> 3.0.0)
   net-dns
   net-ssh
   redis
+  rest-client
   sidekiq
   sinatra
   thor

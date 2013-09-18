@@ -5,6 +5,7 @@ require 'set'
 
 require_relative '../core/jobs'
 require_relative 'drone-config'
+require_relative '../core/domain-groups'
 
 class LRUCreativeIdLocator
   def initialize(size)
@@ -57,6 +58,7 @@ STDIN.each do |line|
           _id: sending_event_match[0][0],
           creative_id: creative_id.to_i,
           recipient: sending_event_match[0][1],
+          domain_group: DomainGroups.extract_domain(sending_event_match[0][1]),
           relay: sending_event_match[0][2],
           total_delay: sending_event_match[0][3],
           time_before_queue_manager: sending_event_match[0][4],
