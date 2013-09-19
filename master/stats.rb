@@ -2,6 +2,10 @@
 require 'thor'
 require 'tire'
 
+Tire.configure do
+  url '142.54.174.66:9200'
+end
+
 class Stats < Thor
   desc 'sends creativeId', 'List sends'
   option :by, type: :string
@@ -74,7 +78,7 @@ class Stats < Thor
 
     result = Tire.search('marketing') do
       query do
-        bool do
+        boolean do
           must { term :creative_id, creative_id }
           must { term :action, action } if not action.nil?
         end
@@ -103,6 +107,7 @@ class Stats < Thor
       result.results.map { |x| x.to_hash }.each { |x|
         output << "#{x[:recipient]} did a #{x[:action]} originated at #{x[:drone_domain]}"
       }
+      exit 0
     end
 
     totals = options[:totals]
@@ -129,17 +134,103 @@ class Stats < Thor
   end
 
   desc 'Report creativeId', 'Shows a action to send ratio reports'
+  option :ratio, type: :string
+  option :size, type: :numeric, default: 5
+  option :include_zero, type: :boolean
 
   def report(creative_id)
+    ratio = options[:ratio]
+    facet_size = options[:size]
 
-  end
+    stats = Tire.search 'stats' do
+      query do
+        boolean do
+          must { term :creative_id, creative_id }
+        end
+      end
 
-  desc 'remove_tests', 'removes tests from the indexes'
+      facet 'sent' do
+        terms :domain_group, size: facet_size
+        facet_filter :term, {status: 'sent'}
+      end
 
-  def remove_tests
-    Tire.index 'stats' do
-      delete
+      facet 'bounced' do
+        terms :domain_group, size: facet_size
+        facet_filter :term, {status: 'bounced'}
+      end
+
+      facet 'deferred' do
+        terms :domain_group, size: facet_size
+        facet_filter :term, {status: 'deferred'}
+      end
+
     end
+
+    marketing = Tire.search 'marketing' do
+      query do
+        boolean do
+          must { term :creative_id, creative_id }
+        end
+      end
+      facet 'click' do
+        terms :domain_group, size: facet_size
+        facet_filter :term, {action: 'click'}
+      end
+
+      facet 'unsubscribe' do
+        terms :domain_group, size: facet_size
+        facet_filter :term, {action: 'unsubscribe'}
+      end
+
+      facet 'open' do
+        terms :domain_group, size: facet_size
+        facet_filter :term, {action: 'open'}
+      end
+    end
+
+    if not ratio.nil?
+      ratio_params = ratio.split('/')
+
+      output = Array.new
+
+      marketing_action_facets = marketing.results.facets.map do |key, facet|
+        {name: key,
+         terms: facet['terms'].map { |term|
+           {term: term['term'],
+            count: term['count'].to_f,
+            name: key} }
+        }
+      end
+
+
+      stats_transport_facets = stats.results.facets.map do |key, facet|
+        {name: key,
+         terms: facet['terms'].map { |term|
+           {term: term['term'],
+            count: term['count'].to_f,
+            name: key} }
+        }
+      end
+
+      combined_facets = marketing_action_facets.concat(stats_transport_facets)
+
+      combined_facets.select { |x| x[:name] == ratio_params[1] }.first[:terms].each do |facet|
+        total_transport = facet[:count].to_f
+
+        marketing_action = combined_facets.select { |x| x[:name] == ratio_params[0] }.first[:terms].select { |x| x[:term] == facet[:term] && x[:name] != facet[:name] }.first
+
+        total_action = marketing_action.nil? ? 0 : marketing_action[:count]
+        single_stat = (total_action/total_transport).round(4)
+
+        next if single_stat == 0.0 && !options[:include_zero]
+
+        output << "#{facet[:term]} #{single_stat}"
+
+      end
+
+      output.sort_by { |x| x.split(' ')[1].to_f }.reverse.each { |x| $stdout.puts x }
+    end
+
   end
 end
 
