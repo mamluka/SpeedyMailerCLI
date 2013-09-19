@@ -69,7 +69,7 @@ class Stats < Thor
   desc 'clicks creativeId', 'List clicks opens and unsubscribes'
   option :recent, type: :boolean
   option :action, type: :string
-  option :totals, type: :array
+  option :totals, type: :array, default: 'actions'
 
   def clicks(creative_id)
 
@@ -92,7 +92,7 @@ class Stats < Thor
 
       sort { by :time, 'desc' }
 
-      facet 'drones' do
+      facet 'domains' do
         terms :drone_domain
       end
 
@@ -115,7 +115,7 @@ class Stats < Thor
     if not totals.nil?
 
       if totals.include? 'domains'
-        result.results.facets['drones']['terms'].each do |facet|
+        result.results.facets['domains']['terms'].each do |facet|
           output << "#{facet['term']}: #{facet['count']}"
         end
       end
