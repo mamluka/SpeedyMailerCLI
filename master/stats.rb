@@ -107,7 +107,6 @@ class Stats < Thor
       result.results.map { |x| x.to_hash }.each { |x|
         output << "#{x[:recipient]} did a #{x[:action]} originated at #{x[:drone_domain]}"
       }
-      exit 0
     end
 
     totals = options[:totals]
