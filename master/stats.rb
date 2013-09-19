@@ -3,7 +3,7 @@ require 'thor'
 require 'tire'
 
 Tire.configure do
-  url '142.54.174.66:9200'
+  url ENV['MASTER_STATS_ES_URL'] || 'localhost:9200'
 end
 
 class Stats < Thor
@@ -67,9 +67,10 @@ class Stats < Thor
   end
 
   desc 'clicks creativeId', 'List clicks opens and unsubscribes'
-  option :recent, type: :numeric, default: 0
+  option :recent, type: :numeric, default: 20
   option :action, type: :string
   option :total, type: :boolean
+
 
   def clicks(creative_id)
 
@@ -122,17 +123,22 @@ class Stats < Thor
 
   desc 'Report creativeId', 'Shows a action to send ratio reports'
   option :ratio, type: :string
-  option :size, type: :numeric, default: 5
+  option :size, type: :numeric, default: 1000
   option :include_zero, type: :boolean
+  option :limits, type: :string, default: '0/10 0-1'
+  option :include_actual, type: :boolean, default: true
+  option :drone, type: :string
 
   def report(creative_id)
     ratio = options[:ratio]
     facet_size = options[:size]
+    drone = options[:drone]
 
     stats = Tire.search 'stats' do
       query do
         boolean do
           must { term :creative_id, creative_id }
+          must { term :drone_domain, drone } if not drone.nil?
         end
       end
 
@@ -157,6 +163,7 @@ class Stats < Thor
       query do
         boolean do
           must { term :creative_id, creative_id }
+          must { term :drone_domain, drone } if not drone.nil?
         end
       end
       facet 'click' do
@@ -177,6 +184,14 @@ class Stats < Thor
 
     if not ratio.nil?
       ratio_params = ratio.split('/')
+
+      limits = options[:limits].scan(/(\d+?)\/(\d+?)\s(\d+\.?\d*?)-(\d+\.?\d*?)$/)[0]
+
+      if limits.nil?
+        $stderr.puts 'Limits is not in the correct format'
+      end
+
+      limits = limits.map { |x| x.to_f }
 
       output = Array.new
 
@@ -204,18 +219,26 @@ class Stats < Thor
       combined_facets.select { |x| x[:name] == ratio_params[1] }.first[:terms].each do |facet|
         total_transport = facet[:count].to_f
 
+        next if total_transport <= limits[1]
         marketing_action = combined_facets.select { |x| x[:name] == ratio_params[0] }.first[:terms].select { |x| x[:term] == facet[:term] && x[:name] != facet[:name] }.first
 
         total_action = marketing_action.nil? ? 0 : marketing_action[:count]
+
+        next if total_action <= limits[0]
+
         single_stat = (total_action/total_transport).round(4)
 
         next if single_stat == 0.0 && !options[:include_zero]
+        next if single_stat <= limits[2] || single_stat >= limits[3]
 
-        output << "#{facet[:term]} #{single_stat}"
+        line = "#{facet[:term]} #{single_stat}"
+        line = "#{line} [#{total_action}/#{total_transport}]" if options[:include_actual]
+
+        output << line
 
       end
 
-      output.sort_by { |x| x.split(' ')[1].to_f }.reverse.each { |x| $stdout.puts x }
+      output.each { |x| $stdout.puts x }
     end
 
   end
