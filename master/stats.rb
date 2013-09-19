@@ -67,14 +67,15 @@ class Stats < Thor
   end
 
   desc 'clicks creativeId', 'List clicks opens and unsubscribes'
-  option :recent, type: :boolean
+  option :recent, type: :numeric, default: 0
   option :action, type: :string
-  option :totals, type: :array, default: 'actions'
+  option :total, type: :boolean
 
   def clicks(creative_id)
 
     get_recipients = options[:recent]
     action = options[:action]
+    total = options[:total]
 
     result = Tire.search('marketing') do
       query do
@@ -84,11 +85,7 @@ class Stats < Thor
         end
       end
 
-      if get_recipients
-        size 50
-      else
-        size 0
-      end
+      size get_recipients
 
       sort { by :time, 'desc' }
 
@@ -103,32 +100,23 @@ class Stats < Thor
 
     output = Array.new
 
-    if not options[:recent].nil?
-      result.results.map { |x| x.to_hash }.each { |x|
-        output << "#{x[:recipient]} did a #{x[:action]} originated at #{x[:drone_domain]}"
-      }
+    result.results.map { |x| x.to_hash }.each { |x|
+      output << "#{x[:recipient]} did a #{x[:action]} originated at #{x[:drone_domain]}"
+    }
+
+    if total
+      result.results.facets['domains']['terms'].each do |facet|
+        output << "#{facet['term']}: #{facet['count']}"
+      end
     end
 
-    totals = options[:totals]
-
-    if not totals.nil?
-
-      if totals.include? 'domains'
-        result.results.facets['domains']['terms'].each do |facet|
-          output << "#{facet['term']}: #{facet['count']}"
-        end
+    if total
+      result.results.facets['actions']['terms'].each do |facet|
+        output << "#{facet['term']}: #{facet['count']}"
       end
-
-      if totals.include? 'actions'
-        result.results.facets['actions']['terms'].each do |facet|
-          output << "#{facet['term']}: #{facet['count']}"
-        end
-      end
-
     end
 
     output.each { |x| $stdout.puts x }
-
 
   end
 
