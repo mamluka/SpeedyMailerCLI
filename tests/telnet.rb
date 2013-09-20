@@ -84,7 +84,7 @@ handler do |job|
   is_good = verify.check email
   logger.info "#{email} is #{is_good ? 'Good' : 'Bad'}"
 
-  $stdout.puts email
+  $stdout.puts email if is_good
 end
 
 
