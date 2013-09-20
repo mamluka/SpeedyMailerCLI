@@ -31,28 +31,32 @@ class Verify
         return false
       end
 
-      mx_server = @mx_servers[provider[0].to_sym]
+      mx_server_list = @mx_servers[provider[0].to_sym]
 
-      if mx_server.nil?
+      if mx_server_list.nil?
         return false
       end
 
       status = Array.new
-      mail = Net::Telnet::new('Host' => mx_server.sample, 'Timeout' => 1, 'Port' => 25)
+      mx_server = mx_server_list.sample
+
+      @logger.info "using mx #{mx_server}"
+
+      mail = Net::Telnet::new('Host' => mx_server, 'Timeout' => 1, 'Port' => 25)
       mail.telnetmode = false
 
       mail.cmd({'String' => 'HELO cookiexfactory.info', 'Match' => /250/})
       mail.cmd({'String' => 'MAIL FROM: david@cookiexfactory.info', 'Match' => /250/})
       mail.cmd({'String' => "RCPT TO: #{recipient}", 'Match' => /\d{3}/}) { |mx_response|
-        logger.info mx_response
+        @logger.info mx_response
         status = mx_response.scan(/\d{3}/).map { |x| x.to_i }
       }
       mail.close
 
       status.include? 250
     rescue Exception => e
-      logger.error e.message
-      logger.error e.backtrace
+      @logger.error e.message
+      @logger.error e.backtrace
       false
     end
 
