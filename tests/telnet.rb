@@ -44,7 +44,7 @@ class Verify
 
       @logger.info "using mx #{mx_server}"
 
-      mail = Net::Telnet::new('Host' => mx_server, 'Timeout' => 1, 'Port' => 25)
+      mail = Net::Telnet::new('Host' => mx_server, 'Timeout' => 10, 'Port' => 25)
       mail.telnetmode = false
 
       mail.cmd({'String' => 'HELO cookiexfactory.info', 'Match' => /250/})
