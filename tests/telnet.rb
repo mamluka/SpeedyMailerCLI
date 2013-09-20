@@ -7,21 +7,23 @@ class Verify
 
   def initialize
     @logger = Logger.new 'email-clean.log'
+
+    @mx_servers = {
+        aol: %w(mailin-01.mx.aol.com mailin-02.mx.aol.com mailin-03.mx.aol.com mailin-04.mx.aol.com),
+        gmail: %w(gmail-smtp-in.l.google.com alt1.gmail-smtp-in.l.google.com alt2.gmail-smtp-in.l.google.com alt3.gmail-smtp-in.l.google.com alt4.gmail-smtp-in.l.google.com),
+        hotmail: %w(mx1.hotmail.com mx2.hotmail.com mx3.hotmail.com mx4.hotmail.com),
+        live: %w(mx1.hotmail.com mx2.hotmail.com mx3.hotmail.com mx4.hotmail.com),
+        msn: %w(mx1.hotmail.com mx2.hotmail.com mx3.hotmail.com mx4.hotmail.com),
+        earthlink: %w(mx1.earthlink.net mx2.earthlink.net mx3.earthlink.net mx4.earthlink.net),
+        verizon: %w(relay.verizon.net),
+        comcast: %w(mx1.comcast.net mx2.comcast.net),
+        charter: %w(ib1.charter.net),
+        juno: %w(mx.vgs.untd.com mx.dca.untd.com),
+        earthlink: %w(mx1.earthlink.net mx2.earthlink.net mx3.earthlink.net mx4.earthlink.net)
+    }
   end
 
-  @mx_servers = {
-      aol: %w(mailin-01.mx.aol.com mailin-02.mx.aol.com mailin-03.mx.aol.com mailin-04.mx.aol.com),
-      gmail: %w(gmail-smtp-in.l.google.com alt1.gmail-smtp-in.l.google.com alt2.gmail-smtp-in.l.google.com alt3.gmail-smtp-in.l.google.com alt4.gmail-smtp-in.l.google.com),
-      hotmail: %w(mx1.hotmail.com mx2.hotmail.com mx3.hotmail.com mx4.hotmail.com),
-      live: %w(mx1.hotmail.com mx2.hotmail.com mx3.hotmail.com mx4.hotmail.com),
-      msn: %w(mx1.hotmail.com mx2.hotmail.com mx3.hotmail.com mx4.hotmail.com),
-      earthlink: %w(mx1.earthlink.net mx2.earthlink.net mx3.earthlink.net mx4.earthlink.net),
-      verizon: %w(relay.verizon.net),
-      comcast: %w(mx1.comcast.net mx2.comcast.net),
-      charter: %w(ib1.charter.net),
-      juno: %w(mx.vgs.untd.com mx.dca.untd.com),
-      earthlink: %w(mx1.earthlink.net mx2.earthlink.net mx3.earthlink.net mx4.earthlink.net)
-  }
+
 
   def check(recipient)
     begin
