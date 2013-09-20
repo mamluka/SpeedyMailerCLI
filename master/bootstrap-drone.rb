@@ -55,8 +55,7 @@ class Bootstrap < Thor
     end
   end
 
-  desc 'update droneIp dronePassword', 'Update cod
-e for a given drone includes a restart'
+  desc 'update droneIp dronePassword', 'Update code for a given drone includes a restart'
 
   def update(drone_ip, password)
 
