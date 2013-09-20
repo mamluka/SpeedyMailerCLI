@@ -3,6 +3,13 @@ require 'clockwork'
 
 include Clockwork
 
+Clockwork.configure do |config|
+  config[:sleep_timeout] = 5
+  config[:logger] = Logger.new('verify-email-job.log')
+  config[:tz] = 'EST'
+  config[:max_threads] = 15
+end
+
 class Verify
 
   def initialize
@@ -22,7 +29,6 @@ class Verify
         earthlink: %w(mx1.earthlink.net mx2.earthlink.net mx3.earthlink.net mx4.earthlink.net)
     }
   end
-
 
 
   def check(recipient)
@@ -77,6 +83,8 @@ handler do |job|
 
   is_good = verify.check email
   logger.info "#{email} is #{is_good ? 'Good' : 'Bad'}"
+
+  $stdout.puts email
 end
 
 
