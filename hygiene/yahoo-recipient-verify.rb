@@ -47,10 +47,13 @@ class YahooEmailVerifier
     submit_form = newpage1.form_with(name: @yahoo_login_form_name) # find form name of form that submits the login
     submit_form.field_with(name: @yahoo_login_username_fieldname).value = @yahoo_user_id
     submit_form.field_with(name: @yahoo_login_password_fieldname).value = @yahoo_password
+    File.open('newpage1.html','w') { |f| f.write newpage1.body }
     newpage2 = submit_form.click_button
+    File.open('newpage2.html','w') { |f| f.write newpage2.body }
     myagent.cookie_jar = temp_jar
 
     agreement_page = myagent.get(@request_token.authorize_url)
+    File.open('agreement.html','w') { |f| f.write agreement_page.body }
     agreement_form = agreement_page.form_with(name: @yahoo_acceptance_form_name)
 
     verifier_code_page = agreement_form.click_button # clicks first submit button
