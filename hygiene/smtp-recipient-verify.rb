@@ -1,21 +1,11 @@
 require 'net/telnet'
-require 'clockwork'
 
-include Clockwork
-
-Clockwork.configure do |config|
-  config[:sleep_timeout] = 5
-  config[:logger] = Logger.new('verify-email-job.log')
-  config[:tz] = 'EST'
-  config[:max_threads] = 15
-end
-
-class Verify
+class SMTPRecipientVerify
 
   def initialize(domain)
 
     @domain = domain
-    @logger = Logger.new 'email-clean.log'
+    @logger = Logger.new 'email-hygiene.log'
 
     @mx_servers = {
         aol: %w(mailin-01.mx.aol.com mailin-02.mx.aol.com mailin-03.mx.aol.com mailin-04.mx.aol.com),
@@ -32,7 +22,7 @@ class Verify
   end
 
 
-  def check(recipient)
+  def verify(recipient)
     begin
       provider = recipient.scan(/@(.+?)\./)[0]
 
@@ -72,22 +62,3 @@ class Verify
 
   end
 end
-
-logger = Logger.new('email-clean.log')
-
-emails = File.readlines(ARGV[0]).map { |x| x.strip }
-
-verify = Verify.new ARGV[1]
-
-handler do |job|
-  email = emails.shift
-  logger.info "about to check #{email}"
-
-  is_good = verify.check email
-  logger.info "#{email} is #{is_good ? 'Good' : 'Bad'}"
-
-  $stdout.puts email if is_good
-end
-
-
-every 8.seconds, 'email.verify'

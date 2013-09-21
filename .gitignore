@@ -8,3 +8,4 @@ master/*.json
 master/lists/*
 master/*.csv
 master/migrations/*.json
+*.csv

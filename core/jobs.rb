@@ -25,6 +25,27 @@ class SendCreativeByDrone
   end
 end
 
+class VerityRecipient
+  include Sidekiq::Worker
+  sidekiq_options :queue => :clean
+
+  def perform(recipient)
+    require_relative '../hygiene/email-hygiene'
+    require_relative '../core/domain-groups'
+
+    verify = EmailVerify.new
+    is_good = verify.verify recipient
+
+    IndexHygieneResult.perform_async({
+                                         recipient: recipient,
+                                         valid: is_good,
+                                         domain: DomainGroups.extract_domain(recipient),
+                                         time: Time.now.to_i,
+                                         time_human: Time.now.to_s,
+                                     })
+  end
+end
+
 class IndexDroneSendingStats
   include Sidekiq::Worker
   sidekiq_options :queue => :master
@@ -79,6 +100,21 @@ class IndexRecipientUnsubscribe
 
     Tire.index 'marketing' do
       store unsubscribe_data
+    end
+
+  end
+
+end
+
+class IndexHygieneResult
+  include Sidekiq::Worker
+  sidekiq_options :queue => :master
+
+  def perform(recipient)
+    require 'tire'
+
+    Tire.index 'hygiene' do
+      store recipient
     end
 
   end
