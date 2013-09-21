@@ -57,8 +57,8 @@ class Verify
       mail.telnetmode = false
 
       mail.cmd({'String' => "HELO #{@domain}", 'Match' => /250/}) { |mx_response| @logger.info mx_response }
-      mail.cmd({'String' => "MAIL FROM: david@#{@domain}", 'Match' => /250/}) { |mx_response| @logger.info mx_response }
-      mail.cmd({'String' => "RCPT TO: #{recipient}", 'Match' => /\d{3}/}) { |mx_response|
+      mail.cmd({'String' => "MAIL FROM: <david@#{@domain}">, 'Match' => /250/}) { |mx_response| @logger.info mx_response }
+      mail.cmd({'String' => "RCPT TO: <#{recipient}">, 'Match' => /\d{3}/}) { |mx_response|
         @logger.info mx_response
         status = mx_response.scan(/\d{3}/).map { |x| x.to_i }
       }
