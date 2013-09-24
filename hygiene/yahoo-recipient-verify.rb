@@ -2,6 +2,7 @@ require 'oauth'
 require 'uri'
 require 'json'
 require 'mechanize'
+require 'watir-webdriver'
 
 class YahooEmailVerifier
   def initialize
@@ -28,6 +29,8 @@ class YahooEmailVerifier
 
   def create_yahoo_app_session
 
+    client = Watir::Browser.new :phantomjs
+
     @auth_consumer=OAuth::Consumer.new @consumer_key,
                                        @consumer_secret, {
             :site => @yahoo_oauth_url,
@@ -39,28 +42,25 @@ class YahooEmailVerifier
 
     @request_token = @auth_consumer.get_request_token
 
-    myagent = Mechanize.new
-    myagent.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-    newpage1 = myagent.get @yahoo_user_login_url
-    temp_jar = myagent.cookie_jar
-    submit_form = newpage1.form_with(name: @yahoo_login_form_name) # find form name of form that submits the login
-    submit_form.field_with(name: @yahoo_login_username_fieldname).value = @yahoo_user_id
-    submit_form.field_with(name: @yahoo_login_password_fieldname).value = @yahoo_password
-    File.open('newpage1.html','w') { |f| f.write newpage1.body }
-    newpage2 = submit_form.click_button
-    File.open('newpage2.html','w') { |f| f.write newpage2.body }
-    myagent.cookie_jar = temp_jar
+    client.goto @yahoo_user_login_url
 
-    agreement_page = myagent.get(@request_token.authorize_url)
-    File.open('agreement.html','w') { |f| f.write agreement_page.body }
-    agreement_form = agreement_page.form_with(name: @yahoo_acceptance_form_name)
+    client.text_field(name: 'login').set @yahoo_user_id
+    client.text_field(name: 'passwd').set @yahoo_password
 
-    verifier_code_page = agreement_form.click_button # clicks first submit button
+    client.button(name: '.save').click
 
-    verifier_code_html = verifier_code_page.search("//span[@id='shortCode']") # returns span html
+    while !client.url.include?('my.yahoo.com')
+      sleep 0.5
+    end
 
-    verifier_code = verifier_code_html.children.text # Nokogiri, the embedded parser within Mechanize, returns the full span text, but calling children will put the text of the span
+    client.goto @request_token.authorize_url
+
+    client.button(name: 'agree').click
+    code = client.span(id: 'shortCode')
+    code.wait_until_present
+
+    verifier_code = code.text
 
     @access_token=@request_token.get_access_token(:oauth_verifier => verifier_code)
 

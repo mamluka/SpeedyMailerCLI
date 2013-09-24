@@ -1,13 +1,27 @@
-require 'fb_graph'
+require 'koala'
 
+@graph = Koala::Facebook::API.new('CAACEdEose0cBABGiO7W082A9so0KklGlw0GM6Jf91Iz5J5KY0e09W6pZBZBkeZAFbeAUHEe7GhLmoKT23ABLZCjldnxfjZAyJ3KOD5ooZBrS3MIgg9BfMEQc8PZCld2QZA6Fzits51nZCPZCfONeQKDszxIZCDXo21VACyJRNRPZAjYYWUmq3MCuIsL7JMceuay2m0NsKLzpHRAb4AZDZD')
 
-#FbGraph.debug!
+page = @graph.get_page('nike')
 
-#users = FbGraph::User.search('smith', limit: 5000, access_token: 'CAACEdEose0cBANjju2GovPoxgG0EqAEfNWIOOrfLyfLgZACKMbBcyog36JGtKZAZBm9TL1S6UpKDxAlyfkDkM6c3801ZBCPFHZBKZC7cGRn4goQbuXCxybNeiS61KAXP5XkSO3f1cvldbZC9rAn9gi2SLEugODBqpDHpnseH6VdAYXEVoBHKUMQToeeZBtiZCV0gZD')
+feed = @graph.get_connections(page['id'], 'feed')
 
-posts = FbGraph::Searchable.search('solar panels', limit: 10, access_token: 'CAACEdEose0cBAFAXfYkbjc8650W9Yw7qFCZCKzayeQMPZAVprEspZA93SklNPtPdb0OcVpLtZBYXBysjIHfV3RNUiVQi6r5oGHXyXt9qTKOIYgYZAknOPgyJMTwt89wY27NTASROZCSytwI2H8z8oPnaagRIlZCiCfwpeTVAPulY7PvsjUOXtTjdDUii5G9oqcZD')
+first_post = feed.first['id']
 
-puts posts.length
+likes = @graph.get_connection(first_post, '/likes', limit: 1000)
 
-puts posts.first
+counter = 0
+like_users = Array.new
+
+while like_users.length < 5000
+  #likes.each { |x| $stdout.puts x['id'] }
+
+  like_users.concat(likes.map { |x| x['id'] })
+
+  likes =likes.next_page
+end
+
+like_users.each_slice(100).each do |x|
+  @graph.get_objects(x).each { |k, v| $stdout.puts "#{v['username']}@facebook.com" if not v['username'].nil? }
+end
 
