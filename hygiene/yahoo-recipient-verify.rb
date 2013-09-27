@@ -50,14 +50,14 @@ class YahooEmailVerifier
 
     client.button(name: '.save').click
 
-
     try_count = 0
-    while !client.url.include?('my.yahoo.com') || try_count <= 20
+    while !client.url.include?('my.yahoo.com') && try_count <= 20
       sleep 0.5
       try_count = try_count + 1
     end
 
     if try_count >= 20
+      p 'Was not able to login'
       return false
     end
 
