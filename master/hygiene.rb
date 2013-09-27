@@ -44,7 +44,7 @@ class Hygiene < Thor
       end
     end
 
-    every interval.minutes, 'clean.recipient'
+    every interval.seconds, 'clean.recipient'
 
     Clockwork::run
   end
