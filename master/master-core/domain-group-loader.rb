@@ -21,7 +21,7 @@ class DomainGroupsLoader
     }
 
     domain_groups[:other] = Array.new
-    full_filename = File.dirname(__FILE__) + '/' + file_name
+    full_filename = file_name
 
     File.open(full_filename, 'r').each do |line|
       line = line.strip

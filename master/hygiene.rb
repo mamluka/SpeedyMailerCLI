@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
 require 'thor'
+require 'clockwork'
 
 require_relative '../core/jobs'
 require_relative 'master-core/domain-group-loader'
+require_relative '../core/orm'
 
 include Clockwork
 
@@ -22,7 +24,7 @@ class Hygiene < Thor
     loader = DomainGroupsLoader.new
     domain_groups = loader.load list_file
 
-    allowed_domain_group = domain_group.select { |k| allowed_to_clean.include? k }
+    allowed_domain_group = domain_groups.select { |k| allowed_to_clean.include? k }
 
     handler do |job|
 
@@ -44,7 +46,7 @@ class Hygiene < Thor
       end
     end
 
-    every interval.seconds, 'clean.recipient'
+    every interval.to_i.seconds, 'clean.recipient'
 
     Clockwork::run
   end
