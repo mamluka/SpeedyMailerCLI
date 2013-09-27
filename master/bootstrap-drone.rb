@@ -55,9 +55,43 @@ class Bootstrap < Thor
     end
   end
 
-  desc 'update droneIp dronePassword', 'Update code for a given drone includes a restart'
+  desc 'update_node droneIp dronePassword', 'Update code for a given drone includes a restart'
 
-  def update(drone_ip, password)
+  def update_node(drone_ip, password)
+    Net::SSH.start(drone_ip, 'drone', :password => password) do |ssh|
+
+      p 'Running update script'
+
+      channel = ssh.open_channel do |ch|
+        channel.request_pty do |ch, success|
+          raise "I can't get pty request" unless success
+
+          ch.exec 'bash ~/SpeedyMailerCLI/update-node.sh' do |ch, success|
+            raise 'could not execute command' unless success
+
+            ch.on_data do |c, data|
+              if data.inspect.include?('[sudo]') || data.inspect.include?('password required for')
+                channel.send_data("#{password}\n")
+                sleep 1
+              end
+              $stdout.print data
+            end
+
+            ch.on_extended_data do |c, type, data|
+              $stderr.print data
+            end
+
+            ch.on_close { puts 'Node is updated and running' }
+          end
+        end
+      end
+      channel.wait
+    end
+  end
+
+  desc 'update_code  droneIp dronePassword', 'Update code for a given drone includes a restart'
+
+  def update_code(drone_ip, password)
 
     Net::SSH.start(drone_ip, 'drone', :password => password) do |ssh|
 
@@ -91,6 +125,7 @@ class Bootstrap < Thor
   end
 
   desc 'stop droneIp dronePassword', 'Stop service for that drone'
+
   def stop(drone_ip, password)
 
     Net::SSH.start(drone_ip, 'drone', :password => password) do |ssh|
@@ -125,6 +160,6 @@ class Bootstrap < Thor
 
   end
 
-  end
+end
 
-  Bootstrap.start
+Bootstrap.start
