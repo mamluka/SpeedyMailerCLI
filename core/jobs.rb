@@ -32,6 +32,7 @@ class VerityRecipient
   def perform(recipient)
     require_relative '../hygiene/email-hygiene'
     require_relative '../core/domain-groups'
+    require_relative '../drones/drone-config'
 
     verify = EmailVerify.new
     is_good = verify.verify recipient
@@ -42,6 +43,7 @@ class VerityRecipient
                                          domain: DomainGroups.extract_domain(recipient),
                                          time: Time.now.to_i,
                                          time_human: Time.now.to_s,
+                                         drone_domain: $config[:domain],
                                      })
   end
 end
