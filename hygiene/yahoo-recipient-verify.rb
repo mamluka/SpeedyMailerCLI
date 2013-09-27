@@ -69,6 +69,8 @@ class YahooEmailVerifier
 
     verifier_code = code.text
 
+    client.close
+
     @access_token=@request_token.get_access_token(:oauth_verifier => verifier_code)
 
   end
