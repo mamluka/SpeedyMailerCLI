@@ -10,7 +10,7 @@ class YahooEmailVerifier
     @consumer_secret = '4aca5b5741578b97ef36b143d7f3d701a5210944'
 
     @yahoo_user_id = 'mamluka_xomix'
-    @yahoo_password = '0953acb2'
+    @yahoo_password = '0953acb'
 
     @yahoo_oauth_request_token_path = '/oauth/v2/get_request_token'
     @yahoo_oauth_access_token_path = '/oauth/v2/get_token'
