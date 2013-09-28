@@ -2,6 +2,7 @@ require_relative 'smtp-recipient-verify'
 require_relative 'yahoo-recipient-verify'
 
 require_relative '../drones/drone-config'
+require_relative '../core/jobs'
 
 class EmailVerify
   def initialize
@@ -20,7 +21,13 @@ class EmailVerify
     return false if not @supported_providers.include? provider
 
     if provider == 'yahoo'
-      @yahoo.create_yahoo_app_session
+      get_session = @yahoo.create_yahoo_app_session
+
+      if not get_session
+        IndexLogMessage.perform_async 'Was not able to login to yahoo page, please check login CAPCHA using proxy', $config[:domain]
+        return false
+      end
+
       is_good = @yahoo.verify recipient
     else
       is_good = @smtp.verify recipient

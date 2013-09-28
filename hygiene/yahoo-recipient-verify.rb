@@ -10,7 +10,7 @@ class YahooEmailVerifier
     @consumer_secret = '4aca5b5741578b97ef36b143d7f3d701a5210944'
 
     @yahoo_user_id = 'mamluka_xomix'
-    @yahoo_password = '0953acb'
+    @yahoo_password = '0953acb2'
 
     @yahoo_oauth_request_token_path = '/oauth/v2/get_request_token'
     @yahoo_oauth_access_token_path = '/oauth/v2/get_token'
@@ -57,7 +57,7 @@ class YahooEmailVerifier
     end
 
     if try_count >= 20
-      p 'Was not able to login'
+      p 'was not able to login'
       return false
     end
 
@@ -72,7 +72,6 @@ class YahooEmailVerifier
     client.close
 
     @access_token=@request_token.get_access_token(:oauth_verifier => verifier_code)
-
   end
 
   def verify(recipient)

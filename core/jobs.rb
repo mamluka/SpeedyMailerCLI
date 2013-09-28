@@ -30,21 +30,25 @@ class VerityRecipient
   sidekiq_options :queue => :clean
 
   def perform(recipient)
-    require_relative '../hygiene/email-hygiene'
-    require_relative '../core/domain-groups'
-    require_relative '../drones/drone-config'
+    begin
+      require_relative '../hygiene/email-hygiene'
+      require_relative '../core/domain-groups'
+      require_relative '../drones/drone-config'
 
-    verify = EmailVerify.new
-    is_good = verify.verify recipient
+      verify = EmailVerify.new
+      is_good = verify.verify recipient
 
-    IndexHygieneResult.perform_async({
-                                         recipient: recipient,
-                                         valid: is_good,
-                                         domain: DomainGroups.extract_domain(recipient),
-                                         time: Time.now.to_i,
-                                         time_human: Time.now.to_s,
-                                         drone_domain: $config[:domain],
-                                     })
+      IndexHygieneResult.perform_async({
+                                           recipient: recipient,
+                                           valid: is_good,
+                                           domain: DomainGroups.extract_domain(recipient),
+                                           time: Time.now.to_i,
+                                           time_human: Time.now.to_s,
+                                           drone_domain: $config[:domain],
+                                       })
+    rescue Exception => ex
+      IndexLogMessage.perform_async(ex.message, $config[:domain])
+    end
   end
 end
 
@@ -117,6 +121,28 @@ class IndexHygieneResult
 
     Tire.index 'hygiene' do
       store recipient
+    end
+
+  end
+
+end
+
+class IndexLogMessage
+  include Sidekiq::Worker
+  sidekiq_options :queue => :master
+
+  def perform(log_message, drone_domain)
+    require 'tire'
+
+    Tire.index 'log' do
+      log = {
+          message: log_message,
+          drone_domain: drone_domain,
+          time: Time.now.to_i,
+          time_human: Time.now.to_s,
+      }
+
+      store log
     end
 
   end
