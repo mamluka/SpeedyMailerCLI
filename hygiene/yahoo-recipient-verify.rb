@@ -1,14 +1,16 @@
 require 'oauth'
 require 'uri'
 require 'json'
-
 require 'rest-client'
+
+require_relative '../drones/drone-config'
+
 
 class YahooEmailVerifier
   def verify(recipient)
 
     begin
-      oauth_class_dump = RestClient.get 'http://localhost:8085/token'
+      oauth_class_dump = RestClient.get "http://#{$config[:master]}:8085/token"
       access_token = Marshal.load oauth_class_dump
 
       response = call_yahoo recipient, access_token
