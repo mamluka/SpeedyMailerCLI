@@ -65,6 +65,15 @@ class Hygiene < Thor
       result.results.map { |x| x.to_hash[:recipient] }.uniq.each { |x| $stdout.puts x }
     end
   end
+
+  desc 'count_domains listFile', 'Count the domain groups'
+
+  def count_domains(list_file)
+    loader = DomainGroupsLoader.new
+    domain_groups = loader.load list_file
+
+    domain_groups.each { |k, v| $stdout.puts "#{k} #{v.length}" }
+  end
 end
 
 Hygiene.start
