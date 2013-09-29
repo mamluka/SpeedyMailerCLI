@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'thor'
 require 'clockwork'
+require 'tire'
 
 require_relative '../core/jobs'
 require_relative 'master-core/domain-group-loader'
@@ -51,6 +52,19 @@ class Hygiene < Thor
     Clockwork::run
   end
 
+  desc 'dump_clean', 'dumps to stdout all good emails'
+
+  def dump_clean
+    Tire.search 'hygiene' do
+      result = query do
+        term :valid, true
+      end
+
+      size 100000
+
+      result.results.map { |x| x.to_hash[:recipient] }.uniq.each { |x| $stdout.puts x }
+    end
+  end
 end
 
 Hygiene.start
