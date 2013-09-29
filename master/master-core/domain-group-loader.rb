@@ -29,7 +29,7 @@ class DomainGroupsLoader
       matched = false
       domains.each { |k, v|
         if v.any? { |domain| line.match(domain) }
-          domain_groups[k] << line
+          domain_groups[k] << line.scan(/[A-Z0-9._%a-z\-]+@(?:[A-Z0-9a-z\-]+\.)+[A-Za-z]{2,4}/)[0]
           matched = true
           break
         end
