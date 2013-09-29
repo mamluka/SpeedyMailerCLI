@@ -21,13 +21,6 @@ class EmailVerify
     return false if not @supported_providers.include? provider
 
     if provider == 'yahoo'
-      get_session = @yahoo.create_yahoo_app_session
-
-      if not get_session
-        IndexLogMessage.perform_async 'Was not able to login to yahoo page, please check login CAPCHA using proxy', $config[:domain]
-        return false
-      end
-
       is_good = @yahoo.verify recipient
     else
       is_good = @smtp.verify recipient

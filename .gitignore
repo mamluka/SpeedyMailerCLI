@@ -9,3 +9,4 @@ master/lists/*
 master/*.csv
 master/migrations/*.json
 *.csv
+hygiene/yahoo-access-token-server/access-token-class-dump.dunp
