@@ -77,7 +77,7 @@ class Hygiene < Thor
 
   desc 'filter', 'filter a list using clean list'
 
-  def filter(list_file, clean_file)
+  def filter(clean_file, list_file)
     emails = File.readlines(clean_file).map { |x| x.strip }
 
     File.open(list_file, 'r').each do |line|
