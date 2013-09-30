@@ -74,6 +74,16 @@ class Hygiene < Thor
 
     domain_groups.each { |k, v| $stdout.puts "#{k} #{v.length}" }
   end
+
+  desc 'filter', 'filter a list using clean list'
+
+  def filter(list_file, clean_file)
+    emails = File.readlines(clean_file).map { |x| x.strip }
+
+    File.open(list_file, 'r').each do |line|
+      $stdout.write line if emails.any? { |x| line.include? x }
+    end
+  end
 end
 
 Hygiene.start
