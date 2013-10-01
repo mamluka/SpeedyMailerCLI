@@ -1,27 +1,37 @@
 require 'koala'
 
-@graph = Koala::Facebook::API.new('CAACEdEose0cBABGiO7W082A9so0KklGlw0GM6Jf91Iz5J5KY0e09W6pZBZBkeZAFbeAUHEe7GhLmoKT23ABLZCjldnxfjZAyJ3KOD5ooZBrS3MIgg9BfMEQc8PZCld2QZA6Fzits51nZCPZCfONeQKDszxIZCDXo21VACyJRNRPZAjYYWUmq3MCuIsL7JMceuay2m0NsKLzpHRAb4AZDZD')
+@graph = Koala::Facebook::API.new('CAACEdEose0cBAHggvR5xl7zIDeffgZAhcwxpRYK3LkyfB0uaU1IptTkVjCqy6YuhryZCFwgEVdi7jImD83S1jz6tO9pSMzHoVFZBltvXq21YYCoZApOsW59UkUzrdo2wZBRJo6jnpc5JU0ZCkVEDro6Q3ZABUPTx4aPRiwLO3ZCbFATdzVO0vbQkMRoikuhCL7wZD')
 
-page = @graph.get_page('nike')
+page = @graph.get_page(ARGV[0])
 
 feed = @graph.get_connections(page['id'], 'feed')
 
-first_post = feed.first['id']
+page_feed_ids = Array.new
 
-likes = @graph.get_connection(first_post, '/likes', limit: 1000)
+while page_feed_ids.length < ARGV[1].to_i
+  feed.each do |story|
+    page_feed_ids << story['id'] if story['from']['id'] == page['id']
+  end
 
-counter = 0
-like_users = Array.new
-
-while like_users.length < 5000
-  #likes.each { |x| $stdout.puts x['id'] }
-
-  like_users.concat(likes.map { |x| x['id'] })
-
-  likes =likes.next_page
+  feed.next_page
 end
 
-like_users.each_slice(100).each do |x|
-  @graph.get_objects(x).each { |k, v| $stdout.puts "#{v['username']}@facebook.com" if not v['username'].nil? }
+page_feed_ids.take(ARGV[1].to_i).each do |id|
+
+  likes = @graph.get_connection(id, '/likes', limit: 1000)
+  like_users = Array.new
+
+  while not likes.nil?
+    p likes.length
+    like_users.concat(likes.map { |x| x['id'] })
+
+    likes =likes.next_page
+  end
+
+  like_users.each_slice(100).each do |x|
+    @graph.get_objects(x).each { |k, v| $stdout.puts "#{v['username']}@facebook.com" if not v['username'].nil? }
+  end
+
 end
+
 

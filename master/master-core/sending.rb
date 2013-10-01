@@ -20,7 +20,7 @@ class Sending
       end
     end
 
-    every interval.minutes, 'send.domain'
+    every interval.seconds, 'send.domain'
 
     Clockwork::run
   end
