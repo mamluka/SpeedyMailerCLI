@@ -242,6 +242,11 @@ class Stats < Thor
     end
 
   end
+
+  desc 'remove_tests', 'Remove tests data'
+  def remove_tests
+
+  end
 end
 
 Stats.start
