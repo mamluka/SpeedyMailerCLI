@@ -1,7 +1,6 @@
-#!/usr/bin/env homedir/.rvm/rubies/ruby-2.0.0-p247/bin/ruby
-
 require 'sidekiq'
 require 'set'
+require 'file-tail'
 
 require_relative '../core/jobs'
 require_relative 'drone-config'
@@ -31,7 +30,12 @@ lru = LRUCreativeIdLocator.new 100
 log_messages = Array.new
 logger = Logger.new('/tmp/mail.log')
 
-STDIN.each do |line|
+File.open('/var/log/mail.log') do |log|
+  
+  log.extend(File::Tail)
+  log.interval = 10
+  log.backward(0)
+  log.tail { |line|  
 
   logger.info line
 
@@ -84,5 +88,6 @@ STDIN.each do |line|
     log_messages.clear
 
   end
+  }
 
 end
