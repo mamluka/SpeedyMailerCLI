@@ -57,6 +57,12 @@ class Drone
     open_tracking_url = create_open_track_url creative_id, email
 
     unsubscribe_template = creative[:unsubscribe_template]
+    creative_body = creative[body_type_key]
+
+    if creative_body.kind_of?(Array)
+      creative_body = creative_body.sample
+    end
+
     if not unsubscribe_template.nil?
       rendered_unsubscribe_template = render_creative_template unsubscribe_template, {unsubscribe_url: create_unsubscribe_url(creative_id, email)}
 
@@ -65,7 +71,7 @@ class Drone
           open_tracking_url: open_tracking_url
       }
 
-      email_body = render_creative_template creative[body_type_key], email_template_hash
+      email_body = render_creative_template creative_body, email_template_hash
       whole_email = email_body + rendered_unsubscribe_template
     else
 
@@ -75,7 +81,7 @@ class Drone
           open_tracking_url: open_tracking_url
       }
 
-      whole_email = render_creative_template creative[body_type_key], email_template_hash
+      whole_email = render_creative_template creative_body, email_template_hash
     end
 
     whole_email
