@@ -29,7 +29,18 @@ class SendCreative < Thor
   def test_send(drone_id, creative_id, email)
 
     sending = Sending.new
-    sending.send_to_specific_drone drone_id, creative_id, email
+
+    if drone_id == 'all'
+      Drone.each { |drone|
+        next if (Time.now - drone.live_at) > 300
+
+        sending.send_to_specific_drone drone.drone_id, creative_id, email
+      }
+    else
+      sending.send_to_specific_drone drone_id, creative_id, email
+    end
+
+
   end
 
   desc 'drones', 'List active drones'
