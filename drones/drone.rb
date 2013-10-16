@@ -23,7 +23,7 @@ class Drone
     mail = Mail.new do
       to email
       from "#{from_name} <#{from_prefix}@#{$config[:domain]}>"
-      subject creative[:subject]
+      subject creative[:subject].kind_of?(Array) ? creative[:subject].sample : creative[:subject]
 
       if not creative[:body_html].nil?
 
